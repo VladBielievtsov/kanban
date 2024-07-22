@@ -1,0 +1,65 @@
+div.ck.ck-editor__main > .ck-editor__editable {
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+div.ck.ck-editor__main > .ck-editor__editable.ck-focused {
+  border: 0;
+  box-shadow: none;
+}
+
+div.ck.ck-toolbar .ck.ck-toolbar__separator {
+  background-color: transparent;
+}
+
+div.ck.ck-toolbar.ck-toolbar_grouping {
+  background-color: transparent;
+  border: 0;
+}
+
+button.ck.ck-button,
+button.ck.ck-button.ck-on {
+  color: hsl(var(--text));
+  background-color: transparent;
+}
+
+button.ck.ck-button:hover,
+button.ck.ck-button.ck-off:hover {
+  background-color: rgb(77, 77, 77);
+}
+
+button.ck.ck-button.ck-on:not(.ck-disabled):hover,
+a.ck.ck-button.ck-on:not(.ck-disabled):hover {
+  background-color: rgb(77, 77, 77);
+}
+
+div.ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content {
+  border: 0;
+}
+
+.ck.ck-list__item {
+  background-color: hsl(var(--background)) !important;
+}
+
+div.ck.ck-content h1,
+div.ck.ck-content h2,
+div.ck.ck-content h3,
+div.ck.ck-content h4,
+div.ck.ck-content h5,
+div.ck.ck-content h6 {
+  font-size: revert;
+  font-weight: revert;
+  line-height: revert;
+  margin: revert;
+  padding: revert;
+}
+
+div.ck.ck-content ul,
+div.ck.ck-content ol {
+  list-style: revert;
+  margin: revert;
+  padding: revert;
+  font-size: revert;
+  line-height: revert;
+}
