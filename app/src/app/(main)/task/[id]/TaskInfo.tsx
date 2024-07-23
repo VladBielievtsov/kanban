@@ -60,7 +60,7 @@ export default function TaskInfo() {
         <div className="py-10">
           <Separator />
         </div>
-        <div>
+        <div className="prose lg:prose-xl max-w-full">
           <CKEditor editor={ClassicEditor} data={"Hello"}></CKEditor>
         </div>
       </div>

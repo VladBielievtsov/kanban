@@ -81,7 +81,9 @@ export default function BoardInfo() {
         </AlertDialog>
       </div>
       <div className="px-10 pt-4">
-        <EmojiPicker icon={icon} onChange={onIconChange} />
+        <div className="inline-block">
+          <EmojiPicker icon={icon} onChange={onIconChange} />
+        </div>
         <Input
           defaultValue={"Untitled"}
           className="p-0 my-2 text-4xl focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent border-0"

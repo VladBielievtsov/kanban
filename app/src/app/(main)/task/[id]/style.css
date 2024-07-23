@@ -42,24 +42,13 @@ div.ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content {
   background-color: hsl(var(--background)) !important;
 }
 
-div.ck.ck-content h1,
-div.ck.ck-content h2,
-div.ck.ck-content h3,
-div.ck.ck-content h4,
-div.ck.ck-content h5,
-div.ck.ck-content h6 {
-  font-size: revert;
-  font-weight: revert;
-  line-height: revert;
-  margin: revert;
-  padding: revert;
+.prose * {
+  color: hsl(var(--foreground)) !important;
 }
 
-div.ck.ck-content ul,
-div.ck.ck-content ol {
-  list-style: revert;
-  margin: revert;
-  padding: revert;
-  font-size: revert;
-  line-height: revert;
+.prose
+  :where(ol > li):not(
+    :where([class~="not-prose"], [class~="not-prose"] *)
+  )::marker {
+  color: hsl(var(--foreground)) !important;
 }
