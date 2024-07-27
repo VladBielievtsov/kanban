@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,23 +16,29 @@ import { Button } from "@/components/ui/button";
 import { Soup } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/user";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const formSchema = z.object({
-  email: z.string().min(2, {
-    message: "Email must be at least 2 characters.",
-  }),
+  email: z
+    .string()
+    .min(2, {
+      message: "Email must be at least 2 characters.",
+    })
+    .email({ message: "Invalid email address." }),
   password: z.string().min(6, {
-    message: "Password must be at least 2 characters.",
+    message: "Password must be at least 6 characters.",
   }),
 });
 
 export default function LoginForm() {
   const router = useRouter();
+  const { login, error, loading, user } = useUserStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "mail@mail.com",
-      password: "password",
+      password: "",
     },
   });
 
@@ -40,23 +46,19 @@ export default function LoginForm() {
     const { email, password } = values;
 
     try {
-      const res = await axios.post("/api/user", { email, password });
+      await login(email, password);
+      const { error: storeError, user: storeUser } = useUserStore.getState();
 
-      if (res.status === 200) {
-        router.push("/");
-        console.log(res.data);
+      if (!storeError) {
+        await router.push("/");
+        console.log(storeUser);
       } else {
-        console.log(res.data.message || "Login failed");
+        console.error("Error during login:", storeError);
       }
-    } catch (error: unknown) {
-      console.error("Error logging in:", error);
-      if (axios.isAxiosError(error)) {
-        console.error(
-          error.response?.data?.message || "An unexpected error occurred"
-        );
-      } else {
-        console.error("An unexpected error occurred");
-      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    } finally {
+      form.resetField("password");
     }
   }
 
@@ -69,7 +71,7 @@ export default function LoginForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col max-w-[300px] w-full mx-auto gap-9"
+          className="flex flex-col max-w-[300px] w-full mx-auto gap-6"
         >
           <FormField
             control={form.control}
@@ -82,7 +84,7 @@ export default function LoginForm() {
                 <FormControl>
                   <Input placeholder="email" {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -97,11 +99,20 @@ export default function LoginForm() {
                 <FormControl>
                   <Input placeholder="password" {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <div className="w-full">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? <LoadingSpinner /> : "Submit"}
+            </Button>
+            {error ? (
+              <p className="mt-2 text-red-500 font-bold text-sm">{error}</p>
+            ) : (
+              false
+            )}
+          </div>
         </form>
       </Form>
     </div>

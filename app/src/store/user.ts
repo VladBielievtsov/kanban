@@ -4,12 +4,12 @@ import { create } from "zustand";
 interface IUser {
   id: string;
   password: string;
-  avatarurl: string;
-  firstname: string;
-  lastname: string;
+  avatar_url: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  createdat: string;
-  updatedat: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 type UserStore = {
@@ -27,10 +27,21 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ loading: true, error: null });
 
     try {
-      const response = await axios.post("/api/login", { email, password });
-      const user: IUser = response.data;
+      const response = await axios.post("http://localhost:4000/login", {
+        email,
+        password,
+      });
 
-      set({ user, loading: false, error: null });
+      if (response.status === 200) {
+        const user: IUser = response.data.user;
+        set({ user, loading: false, error: null });
+      } else {
+        set({
+          user: null,
+          loading: false,
+          error: response.data.message || "Login failed",
+        });
+      }
     } catch (error) {
       let errorMessage = "An unknown error occurred";
       if (axios.isAxiosError(error) && error.response?.data?.message) {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 func main() {
@@ -29,14 +30,14 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	// corsHandler := cors.New(cors.Options{
-	// 	AllowedOrigins:   []string{"http://localhost:3000"},
-	// 	AllowedMethods:   []string{"GET", "POST", "DELETE", "PUT"},
-	// 	AllowedHeaders:   []string{"*"},
-	// 	AllowCredentials: false,
-	// })
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"}, // Ensure this matches your frontend URL
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"}, // Specify required headers
+		AllowCredentials: false,         // Set this if you need to handle cookies or authorization headers
+	})
 
-	// r.Use(corsHandler.Handler)
+	r.Use(corsHandler.Handler)
 
 	fs := http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads")))
 	r.Handle("/uploads/*", fs)
