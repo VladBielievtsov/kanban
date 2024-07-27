@@ -1,8 +1,8 @@
+import React from "react";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { Soup } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 
 export default function Header() {
   return (

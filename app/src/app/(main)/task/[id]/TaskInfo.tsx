@@ -10,15 +10,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+  Button,
+  Input,
+  Separator,
+} from "@/components/ui";
 import { CornerUpLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { Separator } from "@/components/ui/separator";
 import "./style.css";
 
 export default function TaskInfo() {

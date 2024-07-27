@@ -1,8 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { CornerUpLeft, Star, Trash2 } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import EmojiPicker from "./EmojiPicker";
@@ -17,7 +14,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Button,
+  Input,
+  Textarea,
+} from "@/components/ui";
 
 export default function BoardInfo() {
   const [isFavorites, setIsFavorites] = useState(false);

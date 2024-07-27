@@ -10,10 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+  Button,
+  Input,
+  Separator,
+} from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { Plus, SquareArrowOutUpRight, Trash2 } from "lucide-react";
 import Link from "next/link";

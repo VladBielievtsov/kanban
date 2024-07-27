@@ -1,23 +1,22 @@
 "use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
 import {
+  Input,
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Soup } from "lucide-react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useUserStore } from "@/store/user";
+} from "@/components/ui";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Soup } from "lucide-react";
+import { useUserStore } from "@/store/user";
 
 const formSchema = z.object({
   email: z
