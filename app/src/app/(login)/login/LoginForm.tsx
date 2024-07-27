@@ -14,10 +14,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Soup } from "lucide-react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  email: z.string().min(2, {
+    message: "Email must be at least 2 characters.",
   }),
   password: z.string().min(6, {
     message: "Password must be at least 2 characters.",
@@ -25,16 +27,37 @@ const formSchema = z.object({
 });
 
 export default function LoginForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "admin",
+      email: "mail@mail.com",
       password: "password",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const { email, password } = values;
+
+    try {
+      const res = await axios.post("/api/user", { email, password });
+
+      if (res.status === 200) {
+        router.push("/");
+        console.log(res.data);
+      } else {
+        console.log(res.data.message || "Login failed");
+      }
+    } catch (error: unknown) {
+      console.error("Error logging in:", error);
+      if (axios.isAxiosError(error)) {
+        console.error(
+          error.response?.data?.message || "An unexpected error occurred"
+        );
+      } else {
+        console.error("An unexpected error occurred");
+      }
+    }
   }
 
   return (
@@ -50,14 +73,14 @@ export default function LoginForm() {
         >
           <FormField
             control={form.control}
-            name="username"
+            name="email"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
-                  Username
+                  Email
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="username" {...field} />
+                  <Input placeholder="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

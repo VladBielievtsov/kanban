@@ -3,9 +3,9 @@
 import React from "react";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/store/hook";
-import { RootState } from "@/store";
 import "./globals.css";
+import { useThemeStore } from "@/store/theme";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,7 +14,7 @@ export default function ThemeProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const theme = useAppSelector((state: RootState) => state.theme.theme);
+  const { theme } = useThemeStore();
 
   return (
     <html lang="en" data-scroll="0" className={theme}>
@@ -23,6 +23,7 @@ export default function ThemeProvider({
         <meta name="robots" content="noindex,nofollow" />
       </head>
       <body className={cn(inter.className, "dark:bg-zinc-900 bg-white")}>
+        <NextTopLoader />
         {children}
       </body>
     </html>

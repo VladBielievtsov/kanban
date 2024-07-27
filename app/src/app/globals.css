@@ -90,3 +90,15 @@
     background: #555;
   }
 }
+
+#nprogress .bar {
+  @apply bg-indigo-500 !important;
+}
+
+#nprogress .peg {
+  @apply shadow-md shadow-primary !important;
+}
+
+#nprogress .spinner-icon {
+  @apply hidden;
+}

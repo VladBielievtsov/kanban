@@ -56,7 +56,7 @@ export default function NavBar() {
           </div>
         </div>
         <Link
-          href={"/"}
+          href={"/login"}
           className="flex items-center justify-between mt-auto border border-zinc-200 dark:border-zinc-600 w-full rounded-lg p-3 hover:bg-zinc-200 dark:hover:bg-zinc-800"
         >
           <p className="font-bold text-sm">Logout</p>

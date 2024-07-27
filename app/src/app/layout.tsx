@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import StoreProvider from "./StoreProvider";
 import ThemeProvider from "./ThemeProvider";
 
 export default function RootLayout({
@@ -7,11 +6,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <StoreProvider>
-      <ThemeProvider>{children}</ThemeProvider>
-    </StoreProvider>
-  );
+  return <ThemeProvider>{children}</ThemeProvider>;
 }
 
 export const metadata: Metadata = {

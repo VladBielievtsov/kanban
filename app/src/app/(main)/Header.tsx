@@ -1,4 +1,5 @@
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import { Button } from "@/components/ui/button";
 import { Soup } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -16,7 +17,18 @@ export default function Header() {
             <span className="text-lg font-bold">Kanban</span>
           </Link>
         </div>
-        <div>
+        <div className="flex items-center gap-2.5">
+          <div>
+            <Button
+              variant={"outline"}
+              className="flex items-center justify-between w-[243px]"
+            >
+              <span>Search...</span>
+              <kbd className="pointer-events-none ml-auto flex h-5 flex-none select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-semibold opacity-100">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
+          </div>
           <ThemeSwitcher />
         </div>
       </div>

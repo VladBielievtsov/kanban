@@ -132,7 +132,7 @@ export default function Kanban({ borderId }: KanbanProps) {
                       <Input
                         value={section.title}
                         onChange={(e) => updateSectionTitle(e, section.id)}
-                        className="bg-transparent font-bold rounded-r-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-zinc-900 dark:focus-visible:border-white"
+                        className="rounded-r-none"
                       />
                       <Button
                         variant={"outline"}
