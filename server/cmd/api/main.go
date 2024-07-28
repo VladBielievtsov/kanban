@@ -33,8 +33,8 @@ func main() {
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"}, // Ensure this matches your frontend URL
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"}, // Specify required headers
-		AllowCredentials: false,         // Set this if you need to handle cookies or authorization headers
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"}, // Specify required headers
+		AllowCredentials: true,                                                                // Set this if you need to handle cookies or authorization headers
 	})
 
 	r.Use(corsHandler.Handler)

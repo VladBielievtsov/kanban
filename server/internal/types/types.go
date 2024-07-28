@@ -31,6 +31,6 @@ type LoginBody struct {
 }
 
 type LoginResponse struct {
-	User  User   `json:"user"`
-	Token string `json:"token"`
+	User User `json:"user"`
+	// Token string `json:"token"`
 }

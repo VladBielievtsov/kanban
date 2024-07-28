@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -104,11 +105,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := userServices.LoginByEmail(req.Email, req.Password)
+	user, token, err := userServices.LoginByEmail(req.Email, req.Password)
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    token,
+		Expires:  time.Now().UTC().Add(120 * time.Minute),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	})
 
 	utils.JSONResponse(w, http.StatusOK, user)
 }

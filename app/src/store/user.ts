@@ -27,10 +27,14 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ loading: true, error: null });
 
     try {
-      const response = await axios.post("http://localhost:4000/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:4000/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
 
       if (response.status === 200) {
         const user: IUser = response.data.user;

@@ -52,3 +52,10 @@ div.ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content {
   )::marker {
   color: hsl(var(--foreground)) !important;
 }
+
+.ck.ck-editor .ck-editor__top .ck-sticky-panel .ck-toolbar {
+  z-index: 10 !important;
+}
+.ck .ck-sticky-panel__placeholder {
+  display: none !important;
+}

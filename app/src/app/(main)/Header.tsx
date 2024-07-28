@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <div className="h-[60px] flex items-center fixed top-0 left-0 right-0 border-b dark:border-zinc-600 border-zinc-200">
+    <header className="dark:bg-zinc-900 bg-white z-[9999] h-[60px] flex items-center fixed top-0 left-0 right-0 border-b dark:border-zinc-600 border-zinc-200">
       <div className="px-6 flex justify-between items-center w-full">
         <div>
           <Link
@@ -32,6 +32,6 @@ export default function Header() {
           <ThemeSwitcher />
         </div>
       </div>
-    </div>
+    </header>
   );
 }
