@@ -13,10 +13,22 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/github"
 )
 
 var avatarService *services.AvatarServices
 var userServices *services.UserServices
+
+var (
+	githubOauthConfig = &oauth2.Config{
+		ClientID:     "",
+		ClientSecret: "",
+		RedirectURL:  "http://localhost:4000/auth/callback",
+		Endpoint:     github.Endpoint,
+	}
+	oauthStateString = "random-string"
+)
 
 func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.AvatarServices) {
 	userServices = us
@@ -24,6 +36,8 @@ func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.Av
 	r.Post("/register", Register)
 	r.Post("/login", Login)
 	r.Get("/users", GetAllUsers)
+	r.Get("/github/login", GithubLogin)
+	r.Get("/auth/callback", GitHubCallback)
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -122,6 +136,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 
 	utils.JSONResponse(w, http.StatusOK, user)
+}
+
+// Github
+
+func GithubLogin(w http.ResponseWriter, r *http.Request) {
+	url := githubOauthConfig.AuthCodeURL(oauthStateString)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func GitHubCallback(w http.ResponseWriter, r *http.Request) {
+	userInfo, err := userServices.GetGithubUser(w, r, githubOauthConfig, oauthStateString)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, userInfo)
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {

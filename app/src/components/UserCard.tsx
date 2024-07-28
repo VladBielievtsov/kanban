@@ -8,8 +8,6 @@ import { useUserStore } from "@/store/user";
 export default function UserCard() {
   const { user, loading } = useUserStore();
 
-  console.log(user);
-
   return (
     <>
       <Link
@@ -27,7 +25,9 @@ export default function UserCard() {
         ) : (
           <>
             <Avatar>
-              <AvatarImage src={`http://localhost:4000${user?.avatar_url}`} />
+              <AvatarImage
+                src={process.env.NEXT_PUBLIC_BACKEND + user?.avatar_url}
+              />
               <AvatarFallback>{user?.first_name[0]}</AvatarFallback>
             </Avatar>
             <div>

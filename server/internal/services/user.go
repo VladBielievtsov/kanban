@@ -1,18 +1,22 @@
 package services
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"kanban-api/db"
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
 
@@ -106,6 +110,41 @@ func (s *UserServices) LoginByEmail(email, password string) (types.LoginResponse
 		User: user,
 		// Token: tokenString,
 	}, tokenString, nil
+}
+
+func (s *UserServices) GetGithubUser(w http.ResponseWriter, r *http.Request, githubOauthConfig *oauth2.Config, oauthStateString string) (types.GithubResponse, error) {
+	state := r.URL.Query().Get("state")
+	if state != oauthStateString {
+		msg := fmt.Errorf("invalid oauth state, expected '%s', got '%s'", oauthStateString, state)
+		return types.GithubResponse{}, msg
+	}
+
+	errorRes := r.URL.Query().Has("error")
+	if errorRes {
+		err := r.URL.Query().Get("error")
+		http.Redirect(w, r, "http://localhost:3000/login?error="+err, http.StatusTemporaryRedirect)
+	}
+
+	code := r.URL.Query().Get("code")
+	token, err := githubOauthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		return types.GithubResponse{}, err
+	}
+
+	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(token))
+	response, err := client.Get("https://api.github.com/user")
+	if err != nil {
+		return types.GithubResponse{}, err
+	}
+	defer response.Body.Close()
+
+	var userInfo types.GithubResponse
+
+	if err := json.NewDecoder(response.Body).Decode(&userInfo); err != nil {
+		return types.GithubResponse{}, err
+	}
+
+	return userInfo, nil
 }
 
 func (s *UserServices) GetAllUsers() ([]types.User, error) {

@@ -34,3 +34,8 @@ type LoginResponse struct {
 	User User `json:"user"`
 	// Token string `json:"token"`
 }
+
+type GithubResponse struct {
+	Login string `json:"login"`
+	Email string `json:"email"`
+}
