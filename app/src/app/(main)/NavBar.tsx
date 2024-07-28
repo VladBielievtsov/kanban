@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
+import UserCard from "@/components/UserCard";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -7,18 +7,7 @@ export default function NavBar() {
   return (
     <div className="h-full border-r dark:border-zinc-600 border-zinc-200">
       <div className="p-4 h-full flex flex-col">
-        <Link
-          href={"/"}
-          className="mb-10 flex items-center gap-4 border border-zinc-200 dark:border-zinc-600 w-full rounded-lg p-3 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-        >
-          <Avatar>
-            <AvatarImage src="https://avatars.githubusercontent.com/u/124599?v=4" />
-            <AvatarFallback>VB</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-bold text-sm">Vlad Bielievtsov</p>
-          </div>
-        </Link>
+        <UserCard />
         <div>
           <div>
             <h2 className="font-bold">Favorites</h2>

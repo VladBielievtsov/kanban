@@ -22,3 +22,4 @@ export {
 } from "./alert-dialog";
 export { Separator } from "./separator";
 export { Textarea } from "@/components/ui/textarea";
+export { Skeleton } from "@/components/ui/skeleton";
