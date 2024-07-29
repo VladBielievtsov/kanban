@@ -37,7 +37,7 @@ func ConnectDatabase() error {
 }
 
 func Migrate() error {
-	err := DB.AutoMigrate(&types.User{})
+	err := DB.AutoMigrate(&types.User{}, &types.ExternalLogin{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}

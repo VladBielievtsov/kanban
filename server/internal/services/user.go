@@ -147,6 +147,65 @@ func (s *UserServices) GetGithubUser(w http.ResponseWriter, r *http.Request, git
 	return userInfo, nil
 }
 
+func (s *UserServices) AuthByGithub(githubResponse types.GithubResponse) (types.LoginResponse, string, error) {
+	var externalLogin types.ExternalLogin
+	var user types.User
+
+	err := db.DB.Where("provider = ? AND external_id = ?", "github", githubResponse.ID).First(&externalLogin).Error
+	if err == nil {
+		err := db.DB.Where("id = ?", externalLogin.UserID).First(&user).Error
+		if err != nil {
+			return types.LoginResponse{}, "", fmt.Errorf("failed to get users: %v", err)
+		}
+		// Proceed with login
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		err := db.DB.Where("email = ?", githubResponse.Email).First(&user).Error
+		if err == nil {
+			newExternalLogin := types.ExternalLogin{
+				ID:         uuid.New(),
+				UserID:     *user.ID,
+				Provider:   "github",
+				ExternalID: githubResponse.ID,
+			}
+			db.DB.Create(&newExternalLogin)
+			// Proceed with login
+		} else if errors.Is(err, gorm.ErrRecordNotFound) {
+			newUserID := uuid.New()
+			newUser := types.User{
+				ID:        &newUserID,
+				Email:     githubResponse.Email,
+				AvatarURL: githubResponse.AvatarURL,
+				FirstName: githubResponse.Login,
+				LastName:  "",
+				Password:  "",
+			}
+			db.DB.Create(&newUser)
+			newExternalLogin := types.ExternalLogin{
+				ID:         uuid.New(),
+				UserID:     *newUser.ID,
+				Provider:   "github",
+				ExternalID: githubResponse.ID,
+			}
+			db.DB.Create(&newExternalLogin)
+			// Proceed with login
+			user = newUser
+		} else {
+			return types.LoginResponse{}, "", fmt.Errorf("failed to find or create user: %w", err)
+		}
+	} else {
+		return types.LoginResponse{}, "", fmt.Errorf("failed to auth: %v", err)
+	}
+
+	token, err := utils.GenerateToken(user, s.cfg.Application.JWTSecret)
+	if err != nil {
+		return types.LoginResponse{}, "", err
+	}
+
+	return types.LoginResponse{
+		User: user,
+	}, token, nil
+}
+
 func (s *UserServices) GetAllUsers() ([]types.User, error) {
 	var users []types.User
 	tx := db.DB.Begin()

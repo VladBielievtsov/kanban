@@ -14,9 +14,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { Soup } from "lucide-react";
 import { useUserStore } from "@/store/user";
+import Link from "next/link";
+import Github from "@/components/icons/Github";
 
 const formSchema = z.object({
   email: z
@@ -111,6 +113,23 @@ export default function LoginForm() {
             ) : (
               false
             )}
+          </div>
+          <div className="flex justify-center relative">
+            <span className="h-[1px] w-full bg-foreground absolute top-1/2"></span>
+            <span className="dark:bg-zinc-900 bg-white z-10 px-4 text-sm font-bold">
+              OR
+            </span>
+          </div>
+          <div className="w-full">
+            <Button type="button" className="w-full" asChild>
+              <Link
+                href={process.env.NEXT_PUBLIC_BACKEND + "/github/login"}
+                className="flex items-start gap-2"
+              >
+                <Github />
+                <span>Log in with Github</span>
+              </Link>
+            </Button>
           </div>
         </form>
       </Form>

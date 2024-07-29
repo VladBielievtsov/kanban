@@ -36,6 +36,15 @@ type LoginResponse struct {
 }
 
 type GithubResponse struct {
-	Login string `json:"login"`
-	Email string `json:"email"`
+	ID        int64  `json:"id"`
+	Login     string `json:"login"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
+}
+
+type ExternalLogin struct {
+	ID         uuid.UUID `gorm:"type:uuid;not null;primaryKey" json:"id"`
+	UserID     uuid.UUID `gorm:"type:uuid;not null" json:"user_id"`
+	Provider   string    `gorm:"type:varchar(255);not null" json:"provider"`
+	ExternalID int64     `gorm:"not null" json:"external_id"`
 }

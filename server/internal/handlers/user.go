@@ -152,7 +152,23 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.JSONResponse(w, http.StatusOK, userInfo)
+	_, token, err := userServices.AuthByGithub(userInfo)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    token,
+		Expires:  time.Now().UTC().Add(120 * time.Minute),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	})
+
+	http.Redirect(w, r, os.Getenv("FRONTEND"), http.StatusFound)
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
