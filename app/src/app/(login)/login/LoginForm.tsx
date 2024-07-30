@@ -48,11 +48,10 @@ export default function LoginForm() {
 
     try {
       await login(email, password);
-      const { error: storeError, user: storeUser } = useUserStore.getState();
+      const { error: storeError } = useUserStore.getState();
 
       if (!storeError) {
         await router.push("/");
-        console.log(storeUser);
       } else {
         console.error("Error during login:", storeError);
       }

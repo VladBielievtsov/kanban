@@ -38,6 +38,7 @@ func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.Av
 	r.Get("/users", GetAllUsers)
 	r.Get("/github/login", GithubLogin)
 	r.Get("/auth/callback", GitHubCallback)
+	r.Post("/logout", Logout)
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -169,6 +170,20 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, os.Getenv("FRONTEND"), http.StatusFound)
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	})
+
+	utils.JSONResponse(w, http.StatusOK, map[string]string{"message": "You have been logged out"})
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
