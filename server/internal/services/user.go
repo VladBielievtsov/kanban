@@ -228,3 +228,17 @@ func (s *UserServices) GetAllUsers() ([]types.User, error) {
 
 	return users, nil
 }
+
+func (s *UserServices) GetUserByID(userID string) (types.LoginResponse, error) {
+	var user types.User
+
+	err := db.DB.Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return types.LoginResponse{}, fmt.Errorf("could not find user with id: %s", userID)
+		}
+		return types.LoginResponse{}, fmt.Errorf("error retrieving user: %v", err)
+	}
+
+	return types.LoginResponse{User: user}, nil
+}

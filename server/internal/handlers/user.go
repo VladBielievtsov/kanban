@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"kanban-api/internal/middleware"
 	"kanban-api/internal/services"
 	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
@@ -39,6 +40,10 @@ func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.Av
 	r.Get("/github/login", GithubLogin)
 	r.Get("/auth/callback", GitHubCallback)
 	r.Post("/logout", Logout)
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware("SECTER"))
+		r.Get("/me", GetMe)
+	})
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -184,6 +189,22 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	})
 
 	utils.JSONResponse(w, http.StatusOK, map[string]string{"message": "You have been logged out"})
+}
+
+func GetMe(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserContextKey).(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := userServices.GetUserByID(userID)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, user)
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {

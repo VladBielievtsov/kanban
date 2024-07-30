@@ -21,6 +21,7 @@ export default function ThemeProvider({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex,nofollow" />
+        <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
       </head>
       <body className={cn(inter.className, "dark:bg-zinc-900 bg-white")}>
         <NextTopLoader />

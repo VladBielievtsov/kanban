@@ -18,6 +18,7 @@ type UserStore = {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  setUser: () => Promise<void>;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -48,13 +49,29 @@ export const useUserStore = create<UserStore>((set) => ({
         });
       }
     } catch (error) {
-      let errorMessage = "An unknown error occurred";
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage = handleAxiosErrorMessage(error);
       set({ user: null, loading: false, error: errorMessage });
+    }
+  },
+  async setUser() {
+    set({ loading: true, error: null });
+
+    try {
+      const res = await axios.get("http://localhost:4000/me", {
+        withCredentials: true,
+      });
+
+      if (res.status === 200) {
+        set({ user: res.data.user, loading: false, error: null });
+      } else {
+        set({
+          loading: false,
+          error: res.data.message || "Failed to get user",
+        });
+      }
+    } catch (error) {
+      const errorMessage = handleAxiosErrorMessage(error);
+      set({ loading: false, error: errorMessage });
     }
   },
   async logout() {
@@ -68,18 +85,23 @@ export const useUserStore = create<UserStore>((set) => ({
       );
 
       if (res.status === 200) {
-        set({ user: null, loading: false, error: null });
+        set({ loading: false, user: null, error: null });
       } else {
         set({ loading: false, error: res.data.message || "Failed logout" });
       }
     } catch (error) {
-      let errorMessage = "An unknown error occurred";
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage = handleAxiosErrorMessage(error);
       set({ loading: false, error: errorMessage });
     }
   },
 }));
+
+function handleAxiosErrorMessage(error: unknown) {
+  let errorMessage = "An unknown error occurred";
+  if (axios.isAxiosError(error) && error.response?.data?.message) {
+    errorMessage = error.response.data.message;
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+  }
+  return errorMessage;
+}

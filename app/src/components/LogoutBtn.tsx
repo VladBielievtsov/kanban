@@ -15,11 +15,11 @@ export default function LogoutBtn() {
   const handleLogout = async () => {
     try {
       await logout();
-      const { error: storeError } = useUserStore.getState();
-      if (!storeError) {
-        await router.push("/login");
+      const { user } = useUserStore.getState();
+      if (!user) {
+        router.push("/login");
       } else {
-        console.error("Error during logout:", storeError);
+        console.error("Error during logout: user state is not null");
       }
     } catch (error) {
       console.error("Unexpected error:", error);
