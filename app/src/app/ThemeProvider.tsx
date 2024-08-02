@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import { useThemeStore } from "@/store/theme";
 import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "@/components/ui";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function ThemeProvider({
       <body className={cn(inter.className, "bground")}>
         <NextTopLoader />
         {children}
+        <Toaster />
       </body>
     </html>
   );

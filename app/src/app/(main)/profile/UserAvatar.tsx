@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage, Button } from "@/components/ui";
-import { Camera } from "lucide-react";
+import React, { useRef, useState } from "react";
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
   Dialog,
   DialogClose,
   DialogContent,
@@ -10,12 +12,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+  Slider,
+  useToast,
+} from "@/components/ui";
+import { Camera } from "lucide-react";
 import AvatarEditor from "react-avatar-editor";
 import { useThemeStore } from "@/store/theme";
-import { Slider } from "@/components/ui/slider";
-import axios from "axios";
-import { handleAxiosErrorMessage, useUserStore } from "@/store/user";
+import { useUserStore } from "@/store/user";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 
 interface Props {
@@ -37,6 +40,8 @@ export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
 
   const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
   const maxSize = 5 * 1024 * 1024;
+
+  const { toast } = useToast();
 
   const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files![0];
@@ -71,6 +76,28 @@ export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
     setError(null);
   };
 
+  const makeRequest = async (formData: FormData) => {
+    await updateAvatar(userID, formData)
+      .then(() => {
+        setIsOpen(false);
+        setTimeout(() => {
+          resetStates();
+        }, 200);
+        toast({
+          title: "Your avatar has been updated",
+          variant: "success",
+        });
+      })
+      .catch((err) => {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const handleSave = async () => {
     setLoading(true);
     if (editorRef.current && file) {
@@ -81,23 +108,7 @@ export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
           const formData = new FormData();
           formData.append("avatar", blob, `avatar.${fileType.split("/")[1]}`);
 
-          await updateAvatar(userID, formData)
-            .then(() => {
-              setIsOpen(false);
-              setTimeout(() => {
-                resetStates();
-              }, 200);
-            })
-            .catch((err) => {
-              const errorMessage =
-                err instanceof Error
-                  ? err.message
-                  : "An unknown error occurred";
-              setError(errorMessage);
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+          await makeRequest(formData);
         }
       }, fileType);
     }
@@ -105,21 +116,7 @@ export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
       const formData = new FormData();
       formData.append("avatar", file);
 
-      await updateAvatar(userID, formData)
-        .then(() => {
-          setIsOpen(false);
-          setTimeout(() => {
-            resetStates();
-          }, 200);
-        })
-        .catch((err) => {
-          const errorMessage =
-            err instanceof Error ? err.message : "An unknown error occurred";
-          setError(errorMessage);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      await makeRequest(formData);
     }
   };
 

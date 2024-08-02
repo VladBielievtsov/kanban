@@ -31,3 +31,16 @@ export {
   CardHeader,
   CardTitle,
 } from "./card";
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
+export { Slider } from "./slider";
+export { useToast } from "./use-toast";
+export { Toaster } from "./toaster";
