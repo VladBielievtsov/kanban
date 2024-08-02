@@ -69,6 +69,10 @@
     @apply bg-background text-foreground;
   }
 
+  .bground {
+    @apply dark:bg-zinc-900 bg-white;
+  }
+
   /* width */
   ::-webkit-scrollbar {
     width: 8px;

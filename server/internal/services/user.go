@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"kanban-api/db"
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -229,16 +232,47 @@ func (s *UserServices) GetAllUsers() ([]types.User, error) {
 	return users, nil
 }
 
-func (s *UserServices) GetUserByID(userID string) (types.LoginResponse, error) {
+func (s *UserServices) GetUserByID(userID string) (types.User, error) {
 	var user types.User
 
 	err := db.DB.Where("id = ?", userID).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return types.LoginResponse{}, fmt.Errorf("could not find user with id: %s", userID)
+			return types.User{}, fmt.Errorf("could not find user with id: %s", userID)
 		}
-		return types.LoginResponse{}, fmt.Errorf("error retrieving user: %v", err)
+		return types.User{}, fmt.Errorf("error retrieving user: %v", err)
 	}
 
-	return types.LoginResponse{User: user}, nil
+	return user, nil
+}
+
+func (s *UserServices) UploadAvatar(w http.ResponseWriter, r *http.Request, userID string) (string, error) {
+	file, header, err := r.FormFile("avatar")
+	if err != nil {
+		return "", fmt.Errorf("invalid file upload")
+	}
+	defer file.Close()
+
+	fileExt := filepath.Ext(header.Filename)
+	if fileExt == "" {
+		fileExt = ".jpg"
+	}
+
+	newId := uuid.New().String()
+	filePath := filepath.Join("uploads", "avatars", userID+"-"+newId+fileExt)
+
+	outFile, err := os.Create(filePath)
+	if err != nil {
+		return "", fmt.Errorf("unable to create the file for writing")
+	}
+	defer outFile.Close()
+
+	if _, err := file.Seek(0, 0); err != nil {
+		return "", fmt.Errorf("unable to seek file: %v", err)
+	}
+	if _, err := io.Copy(outFile, file); err != nil {
+		return "", fmt.Errorf("unable to save file: %v", err)
+	}
+
+	return filePath, nil
 }

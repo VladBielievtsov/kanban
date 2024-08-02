@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"kanban-api/internal/utils"
 	"net/http"
 
 	"github.com/golang-jwt/jwt"
@@ -18,7 +19,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 
 			tokenCookie, err := r.Cookie("auth_token")
 			if err != nil {
-				http.Error(w, "Unauthorized 1", http.StatusUnauthorized)
+				utils.JSONResponse(w, http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
 				return
 			}
 
@@ -27,19 +28,19 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 			})
 
 			if err != nil || !token.Valid {
-				http.Error(w, "Unauthorized 2", http.StatusUnauthorized)
+				utils.JSONResponse(w, http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
 				return
 			}
 
 			claims, ok := token.Claims.(*jwt.MapClaims)
 			if !ok || !token.Valid {
-				http.Error(w, "Unauthorized 3", http.StatusUnauthorized)
+				utils.JSONResponse(w, http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
 				return
 			}
 
 			userID, err := uuid.Parse((*claims)["sub"].(string))
 			if err != nil {
-				http.Error(w, "Unauthorized 4", http.StatusUnauthorized)
+				utils.JSONResponse(w, http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
 				return
 			}
 

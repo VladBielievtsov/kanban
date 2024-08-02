@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"kanban-api/db"
 	"kanban-api/internal/middleware"
 	"kanban-api/internal/services"
 	"kanban-api/internal/types"
@@ -39,10 +41,11 @@ func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.Av
 	r.Get("/users", GetAllUsers)
 	r.Get("/github/login", GithubLogin)
 	r.Get("/auth/callback", GitHubCallback)
-	r.Post("/logout", Logout)
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware("SECTER"))
 		r.Get("/me", GetMe)
+		r.Post("/logout", Logout)
+		r.Put("/user/{id}/avatar", UpdateAvatar)
 	})
 }
 
@@ -204,7 +207,7 @@ func GetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.JSONResponse(w, http.StatusOK, user)
+	utils.JSONResponse(w, http.StatusOK, types.LoginResponse{User: user})
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
@@ -215,4 +218,38 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSONResponse(w, http.StatusOK, users)
+}
+
+func UpdateAvatar(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "id")
+	user, err := userServices.GetUserByID(userID)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	url, err := userServices.UploadAvatar(w, r, userID)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	oldAvatar := user.AvatarURL
+	user.AvatarURL = url
+
+	if err := db.DB.Save(&user).Error; err != nil {
+		if err := os.Remove(url); err != nil {
+			fmt.Println("Failed to remove new avatar:", err)
+		}
+		utils.JSONResponse(w, http.StatusOK, map[string]string{"message": "Failed to update avatar"})
+		return
+	}
+
+	if oldAvatar != "" && oldAvatar != url {
+		if err := os.Remove(oldAvatar); err != nil {
+			fmt.Println("Failed to remove old avatar:", err)
+		}
+	}
+
+	utils.JSONResponse(w, http.StatusOK, map[string]string{"avatarURL": url})
 }

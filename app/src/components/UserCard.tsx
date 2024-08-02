@@ -11,7 +11,7 @@ export default function UserCard() {
   return (
     <>
       <Link
-        href={"/"}
+        href={"/profile"}
         className="mb-10 flex items-center gap-4 border border-zinc-200 dark:border-zinc-600 w-full rounded-lg p-3 hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         {!user || loading ? (
@@ -26,7 +26,12 @@ export default function UserCard() {
           <>
             <Avatar>
               <AvatarImage
-                src={process.env.NEXT_PUBLIC_BACKEND + user?.avatar_url}
+                src={
+                  user?.avatar_url?.startsWith("http")
+                    ? user?.avatar_url
+                    : process.env.NEXT_PUBLIC_BACKEND + "/" + user?.avatar_url
+                }
+                className="object-cover"
               />
               <AvatarFallback>{user?.first_name[0]}</AvatarFallback>
             </Avatar>

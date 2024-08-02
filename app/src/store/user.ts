@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { create } from "zustand";
 
 interface IUser {
@@ -19,9 +19,13 @@ type UserStore = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: () => Promise<void>;
+  updateAvatar: (
+    userID: string | undefined,
+    formData: FormData
+  ) => Promise<AxiosResponse<any, any> | string>;
 };
 
-export const useUserStore = create<UserStore>((set) => ({
+export const useUserStore = create<UserStore>((set, get) => ({
   user: null,
   loading: false,
   error: null,
@@ -94,9 +98,37 @@ export const useUserStore = create<UserStore>((set) => ({
       set({ loading: false, error: errorMessage });
     }
   },
+  async updateAvatar(userID, formData) {
+    try {
+      const response = await axios.put(
+        `http://localhost:4000/user/${userID}/avatar`,
+        formData,
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        if (get().user) {
+          set((state) => ({
+            user: {
+              ...state.user!,
+              avatar_url: response.data.avatarURL,
+            },
+          }));
+        }
+        return response;
+      } else {
+        set({
+          error: response.data.message || "failed to update avatar",
+        });
+        return response;
+      }
+    } catch (error: unknown) {
+      const errorMessage = handleAxiosErrorMessage(error);
+      throw new Error(errorMessage); // this returning
+    }
+  },
 }));
 
-function handleAxiosErrorMessage(error: unknown) {
+export function handleAxiosErrorMessage(error: unknown) {
   let errorMessage = "An unknown error occurred";
   if (axios.isAxiosError(error) && error.response?.data?.message) {
     errorMessage = error.response.data.message;

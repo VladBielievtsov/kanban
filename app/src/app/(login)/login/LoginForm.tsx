@@ -115,9 +115,7 @@ export default function LoginForm() {
           </div>
           <div className="flex justify-center relative">
             <span className="h-[1px] w-full bg-foreground absolute top-1/2"></span>
-            <span className="dark:bg-zinc-900 bg-white z-10 px-4 text-sm font-bold">
-              OR
-            </span>
+            <span className="bground z-10 px-4 text-sm font-bold">OR</span>
           </div>
           <div className="w-full">
             <Button type="button" className="w-full" asChild>

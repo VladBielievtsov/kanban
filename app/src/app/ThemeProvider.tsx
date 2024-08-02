@@ -23,7 +23,7 @@ export default function ThemeProvider({
         <meta name="robots" content="noindex,nofollow" />
         <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
       </head>
-      <body className={cn(inter.className, "dark:bg-zinc-900 bg-white")}>
+      <body className={cn(inter.className, "bground")}>
         <NextTopLoader />
         {children}
       </body>

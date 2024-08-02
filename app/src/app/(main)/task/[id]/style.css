@@ -59,3 +59,7 @@ div.ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content {
 .ck .ck-sticky-panel__placeholder {
   display: none !important;
 }
+
+.ck.ck-dropdown.ck-toolbar-dropdown {
+  display: none !important;
+}

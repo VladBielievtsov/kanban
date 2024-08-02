@@ -21,5 +21,13 @@ export {
   AlertDialogTrigger,
 } from "./alert-dialog";
 export { Separator } from "./separator";
-export { Textarea } from "@/components/ui/textarea";
-export { Skeleton } from "@/components/ui/skeleton";
+export { Textarea } from "./textarea";
+export { Skeleton } from "./skeleton";
+export {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./card";
