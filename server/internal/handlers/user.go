@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -36,7 +35,6 @@ var (
 func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.AvatarServices) {
 	userServices = us
 	avatarService = as
-	r.Post("/register", Register)
 	r.Post("/login", Login)
 	r.Get("/users", GetAllUsers)
 	r.Get("/github/login", GithubLogin)
@@ -48,64 +46,8 @@ func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.Av
 		r.Put("/user/avatar", UpdateAvatar)
 		r.Put("/user/edit", ChangeName)
 		r.Get("/user/accounts", FindConnectedAccounts)
+		r.Put("/user/password", UpdatePassword)
 	})
-}
-
-func Register(w http.ResponseWriter, r *http.Request) {
-	var req types.RegisterBody
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Printf("Error decoding request body: %v", err)
-		utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
-		return
-	}
-
-	var errors []string
-
-	if strings.TrimSpace(req.Email) == "" {
-		errors = append(errors, "email is required")
-	}
-	if strings.TrimSpace(req.FirstName) == "" {
-		errors = append(errors, "first name is required")
-	}
-	if strings.TrimSpace(req.LastName) == "" {
-		errors = append(errors, "last name is required")
-	}
-	if strings.TrimSpace(req.Password) == "" {
-		errors = append(errors, "password is required")
-	}
-
-	if len(errors) > 0 {
-		utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": strings.Join(errors, ", ")})
-		return
-	}
-
-	id := uuid.New()
-
-	filename, err := avatarService.GenerateAvatar(req.FirstName, id.String())
-	if err != nil {
-		log.Printf("Error generating avatar: %v", err)
-		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
-		return
-	}
-
-	user, err := userServices.RegisterByEmail(
-		id,
-		req.Email,
-		filename,
-		req.FirstName,
-		req.LastName,
-		req.Password,
-	)
-
-	if err != nil {
-		if errRemove := os.Remove(filename); errRemove != nil {
-			log.Printf("Failed to remove avatar file: %v", errRemove)
-		}
-		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
-		return
-	}
-
-	utils.JSONResponse(w, http.StatusOK, user)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +149,7 @@ func GetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.JSONResponse(w, http.StatusOK, types.LoginResponse{User: user})
+	utils.JSONResponse(w, http.StatusOK, types.FilterUser(user))
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
@@ -303,4 +245,25 @@ func FindConnectedAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSONResponse(w, http.StatusOK, types.FilterConnectedAccount(accounts))
+}
+
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserContextKey).(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var req types.ChangePasswordBody
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding request body: %v", err)
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+		return
+	}
+
+	result, err := userServices.UpdatePassword(userID, req.NewPassword)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	utils.JSONResponse(w, http.StatusOK, result)
 }

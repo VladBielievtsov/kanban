@@ -1,4 +1,5 @@
 "use client";
+import ErrorText from "@/components/ErrorText";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import {
   Button,
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui";
 import { useUserStore } from "@/store/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -132,11 +132,7 @@ export default function UserDetailsForm() {
             {loading ? <LoadingSpinner /> : "Save changes"}
           </Button>
         </div>
-        {error && (
-          <div>
-            <p className="text-sm text-red-500 font-bold">{error}</p>
-          </div>
-        )}
+        <ErrorText error={error} />
       </form>
     </Form>
   );

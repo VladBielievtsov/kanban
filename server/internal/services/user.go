@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -31,52 +30,6 @@ func NewUserServices(cfg *config.Config) *UserServices {
 	return &UserServices{
 		cfg: cfg,
 	}
-}
-
-func (s *UserServices) RegisterByEmail(id uuid.UUID, email, avatarUrl, firstName, lastName, password string) (types.User, error) {
-	var count int64
-	if err := db.DB.Model(&types.User{}).Where("LOWER(email) = LOWER(?)", email).Count(&count).Error; err != nil {
-		return types.User{}, fmt.Errorf("error checking existing user: %w", err)
-	}
-
-	if count > 0 {
-		return types.User{}, fmt.Errorf("email already in use")
-	}
-
-	hashedPassword, err := utils.HashPassword(password)
-	if err != nil {
-		return types.User{}, fmt.Errorf("failed to hash password")
-	}
-
-	tx := db.DB.Begin()
-	if tx.Error != nil {
-		return types.User{}, fmt.Errorf("could not begin transaction: %w", tx.Error)
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	user := types.User{
-		ID:        &id,
-		AvatarURL: avatarUrl,
-		FirstName: strings.TrimSpace(firstName),
-		LastName:  strings.TrimSpace(lastName),
-		Password:  string(hashedPassword),
-		Email:     strings.TrimSpace(strings.ToLower(email)),
-	}
-
-	if err := tx.Create(&user).Error; err != nil {
-		tx.Rollback()
-		return types.User{}, fmt.Errorf("could not create user: %w", err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		return types.User{}, fmt.Errorf("could not commit transaction: %w", err)
-	}
-
-	return user, nil
 }
 
 func (s *UserServices) LoginByEmail(email, password string) (types.LoginResponse, string, error) {
@@ -298,4 +251,21 @@ func (s *UserServices) GetConnectedAccountsByUserID(userID string) ([]types.Exte
 	}
 
 	return externalLogin, nil
+}
+
+func (s *UserServices) UpdatePassword(userID, NewPassword string) (map[string]string, error) {
+	hashedPassword, err := utils.HashPassword(NewPassword)
+	if err != nil {
+		return map[string]string{}, fmt.Errorf("failed to hash password")
+	}
+
+	result := db.DB.Model(&types.User{}).Where("id = ?", userID).Updates(map[string]interface{}{
+		"password":     hashedPassword,
+		"has_password": true,
+	})
+	if result.Error != nil {
+		return map[string]string{}, result.Error
+	}
+
+	return map[string]string{"message": "Password successfully updated"}, nil
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -9,8 +11,11 @@ import {
 } from "@/components/ui";
 import React from "react";
 import NewPassword from "./NewPassword";
+import { useUserStore } from "@/store/user";
 
 export default function SecurityTab() {
+  const { user } = useUserStore();
+
   return (
     <TabsContent value="security" className="w-full mt-0">
       <Card className="bground dark:border-zinc-600 border-zinc-200 border-0 rounded-l-none border-l ">
@@ -23,7 +28,7 @@ export default function SecurityTab() {
           <div className="my-5">
             <h3 className="text-xl font-bold">Password</h3>
             <p className="opacity-50">Enter your new password</p>
-            <NewPassword />
+            {!user?.has_password ? <NewPassword /> : <p>has no password</p>}
           </div>
         </CardContent>
       </Card>

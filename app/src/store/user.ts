@@ -1,13 +1,14 @@
+import { axiosClient } from "@/lib/axios-client";
 import axios, { AxiosResponse } from "axios";
 import { create } from "zustand";
 
 interface IUser {
   id: string;
-  password: string;
   avatar_url: string;
   first_name: string;
   last_name: string;
   email: string;
+  has_password: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,6 +27,7 @@ type UserStore = {
     firstName: string,
     lastName: string
   ) => Promise<AxiosResponse<any, any> | string>;
+  newPassword: (password: string) => Promise<AxiosResponse<any, any> | string>;
 };
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -46,7 +48,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
       );
 
       if (response.status === 200) {
-        const user: IUser = response.data.user;
+        const user: IUser = response.data;
         set({ user, loading: false, error: null });
       } else {
         set({
@@ -69,7 +71,8 @@ export const useUserStore = create<UserStore>((set, get) => ({
       });
 
       if (res.status === 200) {
-        set({ user: res.data.user, loading: false, error: null });
+        set({ user: res.data, loading: false, error: null });
+        console.log(res.data);
       } else {
         set({
           loading: false,
@@ -146,6 +149,37 @@ export const useUserStore = create<UserStore>((set, get) => ({
               ...state.user!,
               first_name: response.data.first_name,
               last_name: response.data.last_name,
+            },
+          }));
+        }
+        return response;
+      } else {
+        set({
+          error: response.data.message || "failed to update user",
+        });
+        return response;
+      }
+    } catch (error: unknown) {
+      const errorMessage = handleAxiosErrorMessage(error);
+      throw new Error(errorMessage);
+    }
+  },
+  async newPassword(password) {
+    try {
+      const response = await axiosClient.put(
+        "/user/password",
+        {
+          password,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        if (get().user) {
+          set((state) => ({
+            user: {
+              ...state.user!,
+              has_password: true,
             },
           }));
         }

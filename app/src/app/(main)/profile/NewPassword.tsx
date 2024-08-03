@@ -1,5 +1,7 @@
 "use client";
 
+import ErrorText from "@/components/ErrorText";
+import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import {
   Button,
   Form,
@@ -9,9 +11,11 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  useToast,
 } from "@/components/ui";
+import { useUserStore } from "@/store/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -28,6 +32,9 @@ const formSchema = z
   });
 
 export default function NewPassword() {
+  const { newPassword } = useUserStore();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,7 +43,26 @@ export default function NewPassword() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {}
+  const { toast } = useToast();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    await newPassword(values.password)
+      .then(() => {
+        toast({
+          title: "New password has been created",
+          variant: "success",
+        });
+      })
+      .catch((err) => {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
 
   return (
     <Form {...form}>
@@ -72,8 +98,11 @@ export default function NewPassword() {
           )}
         />
         <div>
-          <Button type="submit">Save password</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? <LoadingSpinner /> : "Save password"}
+          </Button>
         </div>
+        <ErrorText error={error} />
       </form>
     </Form>
   );
