@@ -44,3 +44,5 @@ export {
 export { Slider } from "./slider";
 export { useToast } from "./use-toast";
 export { Toaster } from "./toaster";
+export { Label } from "./label";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";

@@ -4,6 +4,8 @@ import { useUserStore } from "@/store/user";
 import React from "react";
 import UserDetailsForm from "./UserDetailsForm";
 import UserAvatar from "./UserAvatar";
+import { Input, Separator } from "@/components/ui";
+import { Label } from "@/components/ui";
 
 export default function ProfileInfo() {
   const { user } = useUserStore();
@@ -16,8 +18,21 @@ export default function ProfileInfo() {
         first_name={user?.first_name}
         userID={user?.id}
       />
-      <div>
+
+      <div className="pb-6">
         <UserDetailsForm />
+      </div>
+      <Separator />
+      <div className="pt-6">
+        <Label className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+          Email
+        </Label>
+        <Input
+          disabled
+          defaultValue={user?.email}
+          placeholder="Email"
+          className="mt-2"
+        />
       </div>
     </div>
   );
