@@ -2,36 +2,16 @@ import axios from "axios";
 
 // process.env.API_BASE_URL
 
-const axiosClient = axios.create({
-  baseURL: "http://localhost:4000/api",
+export const axiosClient = axios.create({
+  baseURL: "http://localhost:4000",
 });
 
-// axiosClient.interceptors.request.use((config) => {
-//   const token = getCookie("ACCESS_TOKEN");
-//   config.headers.Accept = "application/json";
-//   config.headers.Authorization = `Bearer ${token}`;
-//   return config;
-// });
-
-// axiosClient.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   (error) => {
-//     try {
-//       const { response } = error;
-
-//       if (response.status === 401) {
-//         deleteCookie("ACCESS_TOKEN");
-//       } else if (response.status === 404) {
-//         //Show not found
-//       }
-//     } catch (error) {
-//       console.error(error);
-//     }
-
-//     throw error;
-//   }
-// );
-
-export default axiosClient;
+export function handleAxiosErrorMessage(error: unknown) {
+  let errorMessage = "An unknown error occurred";
+  if (axios.isAxiosError(error) && error.response?.data?.message) {
+    errorMessage = error.response.data.message;
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+  }
+  return errorMessage;
+}

@@ -1,4 +1,5 @@
 "use client";
+import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import {
   Button,
   Form,
@@ -8,24 +9,39 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  useToast,
 } from "@/components/ui";
 import { useUserStore } from "@/store/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
-  }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
-  }),
+  firstName: z
+    .string()
+    .min(2, {
+      message: "First name must be at least 2 characters.",
+    })
+    .refine((v) => v.trim().split(" ").length === 1, {
+      message: "First name should contain only one word",
+    }),
+  lastName: z
+    .string()
+    .min(2, {
+      message: "Last name must be at least 2 characters.",
+    })
+    .refine((v) => v.trim().split(" ").length === 1, {
+      message: "First name should contain only one word",
+    }),
 });
 
 export default function UserDetailsForm() {
-  const { user } = useUserStore();
+  const { user, editUser } = useUserStore();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,9 +59,38 @@ export default function UserDetailsForm() {
     }
   }, [user, form]);
 
+  const formValues = form.watch();
+
+  useEffect(() => {
+    const hasChnages =
+      formValues.firstName.trim() !== user?.first_name ||
+      formValues.lastName.trim() !== user?.last_name;
+
+    setIsDisabled(!hasChnages);
+  }, [formValues, user]);
+
+  const { toast } = useToast();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    setLoading(true);
+    setError(null);
+    editUser(values.firstName, values.lastName)
+      .then(() => {
+        toast({
+          title: "User datails has been updated",
+          variant: "success",
+        });
+      })
+      .catch((err) => {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
+
   return (
     <Form {...form}>
       <form
@@ -83,8 +128,15 @@ export default function UserDetailsForm() {
           )}
         />
         <div>
-          <Button type="submit">Save changes</Button>
+          <Button type="submit" disabled={loading || isDisabled}>
+            {loading ? <LoadingSpinner /> : "Save changes"}
+          </Button>
         </div>
+        {error && (
+          <div>
+            <p className="text-sm text-red-500 font-bold">{error}</p>
+          </div>
+        )}
       </form>
     </Form>
   );

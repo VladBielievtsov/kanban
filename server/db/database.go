@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
-	"kanban-api/internal/utils"
 	"log"
 
-	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -31,8 +29,6 @@ func ConnectDatabase() error {
 	}
 	log.Println("🚀 Connected Successfully to the Database")
 
-	createDefaultUser()
-
 	return nil
 }
 
@@ -46,34 +42,34 @@ func Migrate() error {
 	return nil
 }
 
-func createDefaultUser() {
+// func createDefaultUser() {
 
-	var count int64
-	DB.Model(&types.User{}).Count(&count)
+// 	var count int64
+// 	DB.Model(&types.User{}).Count(&count)
 
-	if count == 0 {
-		hashedPassword, err := utils.HashPassword("password")
-		if err != nil {
-			utils.ErrorHandler(err)
-		}
+// 	if count == 0 {
+// 		hashedPassword, err := utils.HashPassword("password")
+// 		if err != nil {
+// 			utils.ErrorHandler(err)
+// 		}
 
-		id := uuid.New()
-		defaultUser := types.User{
-			ID:        &id,
-			Password:  hashedPassword,
-			FirstName: "FirstName",
-			LastName:  "LastName",
-			Email:     "mail@mail.com",
-			AvatarURL: "/uploads/default/avatar.png",
-		}
-		result := DB.FirstOrCreate(&types.User{}, defaultUser)
-		if result.Error != nil {
-			utils.ErrorHandler(err)
-		}
-		fmt.Println("Default user created successfully!")
-		fmt.Println("====================")
-		fmt.Println("Email: mail@mail.com")
-		fmt.Println("Password: password")
-		fmt.Println("====================")
-	}
-}
+// 		id := uuid.New()
+// 		defaultUser := types.User{
+// 			ID:        &id,
+// 			Password:  hashedPassword,
+// 			FirstName: "FirstName",
+// 			LastName:  "LastName",
+// 			Email:     "mail@mail.com",
+// 			AvatarURL: "/uploads/default/avatar.png",
+// 		}
+// 		result := DB.FirstOrCreate(&types.User{}, defaultUser)
+// 		if result.Error != nil {
+// 			utils.ErrorHandler(err)
+// 		}
+// 		fmt.Println("Default user created successfully!")
+// 		fmt.Println("====================")
+// 		fmt.Println("Email: mail@mail.com")
+// 		fmt.Println("Password: password")
+// 		fmt.Println("====================")
+// 	}
+// }

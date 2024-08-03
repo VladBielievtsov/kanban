@@ -29,7 +29,7 @@ interface Props {
 
 export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
   const { theme } = useThemeStore();
-  const { updateAvatar, user } = useUserStore();
+  const { updateAvatar } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
   };
 
   const makeRequest = async (formData: FormData) => {
-    await updateAvatar(userID, formData)
+    await updateAvatar(formData)
       .then(() => {
         setIsOpen(false);
         setTimeout(() => {
@@ -226,7 +226,7 @@ export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button onClick={handleSave}>
+              <Button onClick={handleSave} disabled={loading}>
                 {loading ? <LoadingSpinner /> : "Save"}
               </Button>
             </DialogFooter>

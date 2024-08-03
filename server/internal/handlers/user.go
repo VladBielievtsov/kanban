@@ -45,7 +45,9 @@ func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.Av
 		r.Use(middleware.AuthMiddleware("SECTER"))
 		r.Get("/me", GetMe)
 		r.Post("/logout", Logout)
-		r.Put("/user/{id}/avatar", UpdateAvatar)
+		r.Put("/user/avatar", UpdateAvatar)
+		r.Put("/user/edit", ChangeName)
+		r.Get("/user/accounts", FindConnectedAccounts)
 	})
 }
 
@@ -147,8 +149,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	utils.JSONResponse(w, http.StatusOK, user)
 }
 
-// Github
-
 func GithubLogin(w http.ResponseWriter, r *http.Request) {
 	url := githubOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -221,7 +221,11 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateAvatar(w http.ResponseWriter, r *http.Request) {
-	userID := chi.URLParam(r, "id")
+	userID, ok := r.Context().Value(middleware.UserContextKey).(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	user, err := userServices.GetUserByID(userID)
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -252,4 +256,51 @@ func UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSONResponse(w, http.StatusOK, map[string]string{"avatarURL": url})
+}
+
+func ChangeName(w http.ResponseWriter, r *http.Request) {
+	var req types.ChangeNameBody
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding request body: %v", err)
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+		return
+	}
+
+	userID, ok := r.Context().Value(middleware.UserContextKey).(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := userServices.GetUserByID(userID)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	user.FirstName = strings.TrimSpace(req.FirstName)
+	user.LastName = strings.TrimSpace(req.LastName)
+
+	if err := db.DB.Save(&user).Error; err != nil {
+		utils.JSONResponse(w, http.StatusOK, map[string]string{"message": "Failed to update user"})
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, user)
+}
+
+func FindConnectedAccounts(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserContextKey).(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	accounts, err := userServices.GetConnectedAccountsByUserID(userID)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, types.FilterConnectedAccount(accounts))
 }

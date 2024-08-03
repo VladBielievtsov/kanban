@@ -20,8 +20,11 @@ type UserStore = {
   logout: () => Promise<void>;
   setUser: () => Promise<void>;
   updateAvatar: (
-    userID: string | undefined,
     formData: FormData
+  ) => Promise<AxiosResponse<any, any> | string>;
+  editUser: (
+    firstName: string,
+    lastName: string
   ) => Promise<AxiosResponse<any, any> | string>;
 };
 
@@ -98,10 +101,10 @@ export const useUserStore = create<UserStore>((set, get) => ({
       set({ loading: false, error: errorMessage });
     }
   },
-  async updateAvatar(userID, formData) {
+  async updateAvatar(formData) {
     try {
       const response = await axios.put(
-        `http://localhost:4000/user/${userID}/avatar`,
+        `http://localhost:4000/user/avatar`,
         formData,
         { withCredentials: true }
       );
@@ -123,7 +126,39 @@ export const useUserStore = create<UserStore>((set, get) => ({
       }
     } catch (error: unknown) {
       const errorMessage = handleAxiosErrorMessage(error);
-      throw new Error(errorMessage); // this returning
+      throw new Error(errorMessage);
+    }
+  },
+  async editUser(firstName, lastName) {
+    try {
+      const response = await axios.put(
+        "http://localhost:4000/user/edit",
+        {
+          first_name: firstName,
+          last_name: lastName,
+        },
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        if (get().user) {
+          set((state) => ({
+            user: {
+              ...state.user!,
+              first_name: response.data.first_name,
+              last_name: response.data.last_name,
+            },
+          }));
+        }
+        return response;
+      } else {
+        set({
+          error: response.data.message || "failed to update user",
+        });
+        return response;
+      }
+    } catch (error: unknown) {
+      const errorMessage = handleAxiosErrorMessage(error);
+      throw new Error(errorMessage);
     }
   },
 }));

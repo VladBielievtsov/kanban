@@ -160,18 +160,22 @@ func (s *UserServices) AuthByGithub(githubResponse types.GithubResponse) (types.
 		if err != nil {
 			return types.LoginResponse{}, "", fmt.Errorf("failed to get users: %v", err)
 		}
-		// Proceed with login
+		externalLogin.UserName = githubResponse.Login
+		err = db.DB.Save(&externalLogin).Error
+		if err != nil {
+			return types.LoginResponse{}, "", fmt.Errorf("failed to get users: %v", err)
+		}
 	} else if errors.Is(err, gorm.ErrRecordNotFound) {
 		err := db.DB.Where("email = ?", githubResponse.Email).First(&user).Error
 		if err == nil {
 			newExternalLogin := types.ExternalLogin{
 				ID:         uuid.New(),
 				UserID:     *user.ID,
+				UserName:   githubResponse.Login,
 				Provider:   "github",
 				ExternalID: githubResponse.ID,
 			}
 			db.DB.Create(&newExternalLogin)
-			// Proceed with login
 		} else if errors.Is(err, gorm.ErrRecordNotFound) {
 			newUserID := uuid.New()
 			newUser := types.User{
@@ -186,11 +190,11 @@ func (s *UserServices) AuthByGithub(githubResponse types.GithubResponse) (types.
 			newExternalLogin := types.ExternalLogin{
 				ID:         uuid.New(),
 				UserID:     *newUser.ID,
+				UserName:   githubResponse.Login,
 				Provider:   "github",
 				ExternalID: githubResponse.ID,
 			}
 			db.DB.Create(&newExternalLogin)
-			// Proceed with login
 			user = newUser
 		} else {
 			return types.LoginResponse{}, "", fmt.Errorf("failed to find or create user: %w", err)
@@ -275,4 +279,23 @@ func (s *UserServices) UploadAvatar(w http.ResponseWriter, r *http.Request, user
 	}
 
 	return filePath, nil
+}
+
+func (s *UserServices) GetConnectedAccountsByUserID(userID string) ([]types.ExternalLogin, error) {
+	var externalLogin []types.ExternalLogin
+
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return externalLogin, err
+	}
+
+	err = db.DB.Where("user_id = ?", uid).Find(&externalLogin).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return externalLogin, errors.New("connected accounts not found for the given user ID")
+		}
+		return externalLogin, err
+	}
+
+	return externalLogin, nil
 }
