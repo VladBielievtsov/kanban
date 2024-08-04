@@ -1,10 +1,132 @@
-import React from "react";
+"use client";
+
+import ErrorText from "@/components/ErrorText";
+import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
+import {
+  Button,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  useToast,
+} from "@/components/ui";
+import { useUserStore } from "@/store/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const formSchema = z
+  .object({
+    old_password: z.string().min(1, {
+      message: "Old password is required.",
+    }),
+    password: z.string().min(6, {
+      message: "Password must be at least 6 characters.",
+    }),
+    confirmation_password: z.string(),
+  })
+  .refine((d) => d.password === d.confirmation_password, {
+    message: "Passwords must match.",
+    path: ["confirmation_password"],
+  });
 
 export default function ChangePassword() {
+  const { newPassword } = useUserStore();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      old_password: "",
+      password: "",
+      confirmation_password: "",
+    },
+  });
+
+  const { toast } = useToast();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    setError(null);
+    await newPassword(values.old_password, values.password)
+      .then(() => {
+        toast({
+          title: "Password has been updated",
+          variant: "success",
+        });
+        form.reset();
+        setError(null);
+      })
+      .catch((err) => {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
   return (
-    <div className="my-5">
-      <h3 className="text-xl font-bold">Password</h3>
-      <p className="opacity-50">Enter your new password</p>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 mt-6">
+        <FormField
+          control={form.control}
+          name="old_password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                Old password
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="Old password" {...field} />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                New password
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="New password" {...field} />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmation_password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                Confirm new password
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="Confirm new password" {...field} />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <div>
+          <Button type="submit" disabled={loading}>
+            {loading ? <LoadingSpinner /> : "Save password"}
+          </Button>
+        </div>
+        <ErrorText error={error} />
+      </form>
+    </Form>
   );
 }

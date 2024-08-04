@@ -12,6 +12,7 @@ import {
 import React from "react";
 import NewPassword from "./NewPassword";
 import { useUserStore } from "@/store/user";
+import ChangePassword from "./ChangePassword";
 
 export default function SecurityTab() {
   const { user } = useUserStore();
@@ -28,7 +29,7 @@ export default function SecurityTab() {
           <div className="my-5">
             <h3 className="text-xl font-bold">Password</h3>
             <p className="opacity-50">Enter your new password</p>
-            {!user?.has_password ? <NewPassword /> : <p>has no password</p>}
+            {!user?.has_password ? <NewPassword /> : <ChangePassword />}
           </div>
         </CardContent>
       </Card>

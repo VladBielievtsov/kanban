@@ -47,12 +47,15 @@ export default function NewPassword() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    await newPassword(values.password)
+    setError(null);
+    await newPassword("", values.password)
       .then(() => {
         toast({
           title: "New password has been created",
           variant: "success",
         });
+        form.reset();
+        setError(null);
       })
       .catch((err) => {
         const errorMessage =

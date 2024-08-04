@@ -35,6 +35,7 @@ var (
 func UserRegisterRoutes(r chi.Router, us *services.UserServices, as *services.AvatarServices) {
 	userServices = us
 	avatarService = as
+	_ = avatarService
 	r.Post("/login", Login)
 	r.Get("/users", GetAllUsers)
 	r.Get("/github/login", GithubLogin)
@@ -261,9 +262,10 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := userServices.UpdatePassword(userID, req.NewPassword)
+	result, err := userServices.UpdatePassword(userID, req.OldPassword, req.NewPassword)
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
 	}
 	utils.JSONResponse(w, http.StatusOK, result)
 }

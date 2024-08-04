@@ -250,18 +250,50 @@ func (s *UserServices) GetConnectedAccountsByUserID(userID string) ([]types.Exte
 	return externalLogin, nil
 }
 
-func (s *UserServices) UpdatePassword(userID, NewPassword string) (map[string]string, error) {
+func (s *UserServices) UpdatePassword(userID, OldPassword, NewPassword string) (map[string]string, error) {
+	var user types.User
+
+	err := db.DB.Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return map[string]string{}, fmt.Errorf("could not find user with id: %s", userID)
+		}
+		return map[string]string{}, fmt.Errorf("error retrieving user: %v", err)
+	}
+
+	if user.Password != "" {
+		if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(NewPassword)); err == nil {
+			return map[string]string{}, fmt.Errorf("new password cannot be the same as the current password")
+		}
+
+		if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(OldPassword)); err != nil {
+			return map[string]string{}, fmt.Errorf("incorrect old password")
+		}
+	}
+
 	hashedPassword, err := utils.HashPassword(NewPassword)
 	if err != nil {
 		return map[string]string{}, fmt.Errorf("failed to hash password")
 	}
 
-	result := db.DB.Model(&types.User{}).Where("id = ?", userID).Updates(map[string]interface{}{
+	tx := db.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	result := tx.Model(&user).Updates(map[string]interface{}{
 		"password":     hashedPassword,
 		"has_password": true,
 	})
 	if result.Error != nil {
+		tx.Rollback()
 		return map[string]string{}, result.Error
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return map[string]string{}, fmt.Errorf("failed to commit transaction: %v", err)
 	}
 
 	return map[string]string{"message": "Password successfully updated"}, nil

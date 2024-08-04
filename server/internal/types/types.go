@@ -101,5 +101,6 @@ type ChangeNameBody struct {
 }
 
 type ChangePasswordBody struct {
+	OldPassword string `json:"old_password"`
 	NewPassword string `json:"password"`
 }
