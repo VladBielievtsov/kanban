@@ -88,7 +88,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 	})
 
-	utils.JSONResponse(w, http.StatusOK, user)
+	utils.JSONResponse(w, http.StatusOK, types.FilterUser(user))
 }
 
 func GithubLogin(w http.ResponseWriter, r *http.Request) {

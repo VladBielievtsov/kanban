@@ -32,20 +32,20 @@ func NewUserServices(cfg *config.Config) *UserServices {
 	}
 }
 
-func (s *UserServices) LoginByEmail(email, password string) (types.LoginResponse, string, error) {
+func (s *UserServices) LoginByEmail(email, password string) (types.User, string, error) {
 	var user types.User
 
 	err := db.DB.Where("LOWER(email) = LOWER(?)", email).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return types.LoginResponse{}, "", fmt.Errorf("could not find user with email: %s", email)
+			return user, "", fmt.Errorf("could not find user with email: %s", email)
 		}
-		return types.LoginResponse{}, "", fmt.Errorf("error retrieving user: %v", err)
+		return user, "", fmt.Errorf("error retrieving user: %v", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return types.LoginResponse{}, "", fmt.Errorf("invalid password")
+		return user, "", fmt.Errorf("invalid password")
 	}
 
 	tokenByte := jwt.New(jwt.SigningMethodHS256)
@@ -59,13 +59,10 @@ func (s *UserServices) LoginByEmail(email, password string) (types.LoginResponse
 
 	tokenString, err := tokenByte.SignedString([]byte(s.cfg.Application.JWTSecret))
 	if err != nil {
-		return types.LoginResponse{}, "", fmt.Errorf("generating JWT Token failed")
+		return user, "", fmt.Errorf("generating JWT Token failed")
 	}
 
-	return types.LoginResponse{
-		User: user,
-		// Token: tokenString,
-	}, tokenString, nil
+	return user, tokenString, nil
 }
 
 func (s *UserServices) GetGithubUser(w http.ResponseWriter, r *http.Request, githubOauthConfig *oauth2.Config, oauthStateString string) (types.GithubResponse, error) {
