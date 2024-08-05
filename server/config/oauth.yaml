@@ -1,0 +1,2 @@
+redirect_url: "/auth/callback"
+oauth_state: "random-string"

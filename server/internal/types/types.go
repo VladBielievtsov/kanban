@@ -55,10 +55,6 @@ type LoginBody struct {
 	Password string `json:"password"`
 }
 
-type LoginResponse struct {
-	User User `json:"user"`
-}
-
 type GithubResponse struct {
 	ID        int64  `json:"id"`
 	Login     string `json:"login"`

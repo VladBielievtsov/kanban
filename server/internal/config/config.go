@@ -1,62 +1,74 @@
 package config
 
 import (
-	"fmt"
 	"kanban-api/internal/utils"
 	"log"
-	"os"
+	"path/filepath"
+	"time"
 
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	Application applicationConf
-	Db          DbEnv
+	Db          dbConf
+	OAuth       oauthConf
 }
 
 type applicationConf struct {
-	Port      string
-	Domain    string
-	JWTSecret string
+	Env        string `yaml:"env" env-default:"local"`
+	HTTPServer `yaml:"http_server"`
+	Client     string `yaml:"client" env-default:"http://localhost:3000"`
+	JwtSecret  string `yaml:"jwt_secret" env-default:"SECRET"`
 }
 
-type DbEnv struct {
-	Host     string
-	Port     string
-	Name     string
-	User     string
-	Password string
+type HTTPServer struct {
+	Address     string        `yaml:"address" env-default:"localhost:4000"`
+	Port        string        `yaml:"port" env-default:"4000"`
+	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
+	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
+}
+
+type dbConf struct {
+	Host     string `yaml:"postgres_host" env-default:"localhost"`
+	Port     string `yaml:"postgres_port" env-default:"5432"`
+	Name     string `yaml:"postgres_db" env-default:"kanban"`
+	User     string `yaml:"postgres_user" env-default:"postgres"`
+	Password string `yaml:"postgres_password" env-default:"password"`
+}
+
+type oauthConf struct {
+	RedirectURL string `yaml:"redirect_url" env-default:"/auth/callback"`
+	OauthState  string `yaml:"oauth_state" env-default:"random-string"`
 }
 
 var cfg *Config
 
-func New() (*Config, error) {
-	err := godotenv.Load(".env")
+func New(configsDir string) (*Config, error) {
+	err := godotenv.Load()
 	utils.ErrorHandler(err)
 
-	dbHost := os.Getenv("POSTGRES_HOST")
-	dbPort := os.Getenv("POSTGRES_PORT")
-	dbName := os.Getenv("POSTGRES_DB")
-	dbUser := os.Getenv("POSTGRES_USER")
-	dbPassword := os.Getenv("POSTGRES_PASSWORD")
+	var app applicationConf
+	var db dbConf
+	var oauth oauthConf
 
-	if dbName == "" || dbUser == "" || dbPassword == "" || dbHost == "" || dbPort == "" {
-		return nil, fmt.Errorf("some environment variables are missing")
+	if err := cleanenv.ReadConfig(filepath.Join(configsDir, "application.yaml"), &app); err != nil {
+		return nil, err
+	}
+
+	if err := cleanenv.ReadConfig(filepath.Join(configsDir, "database.yaml"), &db); err != nil {
+		return nil, err
+	}
+
+	if err := cleanenv.ReadConfig(filepath.Join(configsDir, "oauth.yaml"), &oauth); err != nil {
+		return nil, err
 	}
 
 	cfg = &Config{
-		Db: DbEnv{
-			Host:     dbHost,
-			Port:     dbPort,
-			Name:     dbName,
-			User:     dbUser,
-			Password: dbPassword,
-		},
-		Application: applicationConf{
-			Port:      os.Getenv("APP_PORT"),
-			Domain:    os.Getenv("APP_DOMAIN"),
-			JWTSecret: os.Getenv("JWT_SECTER"),
-		},
+		Application: app,
+		Db:          db,
+		OAuth:       oauth,
 	}
 
 	return cfg, nil
