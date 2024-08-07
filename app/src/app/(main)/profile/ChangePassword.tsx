@@ -19,28 +19,32 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchema = z
-  .object({
-    old_password: z.string().min(1, {
-      message: "Old password is required.",
-    }),
-    password: z.string().min(6, {
-      message: "Password must be at least 6 characters.",
-    }),
-    confirmation_password: z.string(),
-  })
-  .refine((d) => d.password === d.confirmation_password, {
-    message: "Passwords must match.",
-    path: ["confirmation_password"],
-  });
+const formSchema = (has_password: boolean) => {
+  return z
+    .object({
+      old_password: z.string().min(has_password ? 1 : 0, {
+        message: "Old password is required.",
+      }),
+      password: z.string().min(6, {
+        message: "Password must be at least 6 characters.",
+      }),
+      confirmation_password: z.string(),
+    })
+    .refine((d) => d.password === d.confirmation_password, {
+      message: "Passwords must match.",
+      path: ["confirmation_password"],
+    });
+};
 
 export default function ChangePassword() {
-  const { newPassword } = useUserStore();
+  const { updatePassword, user } = useUserStore();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const fSchema = formSchema(user?.has_password || false);
+
+  const form = useForm<z.infer<typeof fSchema>>({
+    resolver: zodResolver(fSchema),
     defaultValues: {
       old_password: "",
       password: "",
@@ -50,19 +54,21 @@ export default function ChangePassword() {
 
   const { toast } = useToast();
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof fSchema>) {
     setLoading(true);
     setError(null);
-    await newPassword(values.old_password, values.password)
+    await updatePassword(values.old_password, values.password)
       .then(() => {
         toast({
-          title: "Password has been updated",
+          title: user?.has_password
+            ? "Password has been updated"
+            : "New password has been created",
           variant: "success",
         });
         form.reset();
         setError(null);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         const errorMessage =
           err instanceof Error ? err.message : "An unknown error occurred";
         setError(errorMessage);
@@ -75,21 +81,23 @@ export default function ChangePassword() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 mt-6">
-        <FormField
-          control={form.control}
-          name="old_password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
-                Old password
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="Old password" {...field} />
-              </FormControl>
-              <FormMessage className="text-red-500" />
-            </FormItem>
-          )}
-        />
+        {user?.has_password && (
+          <FormField
+            control={form.control}
+            name="old_password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                  Old password
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="Old password" {...field} />
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="password"

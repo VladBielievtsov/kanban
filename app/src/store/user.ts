@@ -27,7 +27,7 @@ type UserStore = {
     firstName: string,
     lastName: string
   ) => Promise<AxiosResponse<any, any> | string>;
-  newPassword: (
+  updatePassword: (
     old_password: string,
     password: string
   ) => Promise<AxiosResponse<any, any> | string>;
@@ -167,7 +167,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
       throw new Error(errorMessage);
     }
   },
-  async newPassword(old_password, password) {
+  async updatePassword(old_password, password) {
     try {
       const response = await axiosClient.put(
         "/user/password",
