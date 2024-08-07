@@ -76,6 +76,10 @@ type ConnectedAccountResponse struct {
 	Provider string    ` json:"provider"`
 }
 
+type RemoveExternalLoginRequest struct {
+	Provider string `json:"provider"`
+}
+
 func FilterConnectedAccount(externalLogins []ExternalLogin) []ConnectedAccountResponse {
 	var connectedAccounts []ConnectedAccountResponse
 

@@ -13,6 +13,9 @@ type ConnectedAccountsStore = {
   error: string | null;
   connectedAccounts: ConnectedAccounts[] | null;
   getAccounts: () => Promise<AxiosResponse<any, any> | string>;
+  unlinkAccount: (
+    provider: string
+  ) => Promise<AxiosResponse<any, any> | string>;
 };
 
 export const useConnectedAccountsStore = create<ConnectedAccountsStore>(
@@ -45,6 +48,34 @@ export const useConnectedAccountsStore = create<ConnectedAccountsStore>(
       } catch (error: unknown) {
         const errorMessage = handleAxiosErrorMessage(error);
         set({ loading: false, error: errorMessage });
+        throw new Error(errorMessage);
+      }
+    },
+    async unlinkAccount(provider) {
+      set({ error: null });
+      try {
+        const response = await axiosClient.delete(
+          `/user/accounts/${provider}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 200) {
+          set({
+            connectedAccounts: null,
+            error: null,
+          });
+          return response;
+        } else {
+          set({
+            error: response.data.message || "Failed to unlink account",
+          });
+          return response;
+        }
+      } catch (error: unknown) {
+        const errorMessage = handleAxiosErrorMessage(error);
+        set({ error: errorMessage });
         throw new Error(errorMessage);
       }
     },

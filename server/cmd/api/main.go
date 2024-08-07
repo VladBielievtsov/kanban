@@ -66,7 +66,14 @@ func main() {
 		r.Put("/user/avatar", handlers.UpdateAvatar(db, userServices))
 		r.Put("/user/edit", handlers.ChangeName(db, userServices))
 		r.Put("/user/password", handlers.UpdatePassword(userServices))
+	})
+
+	// ACCOUNTS
+
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Get("/user/accounts", handlers.FindConnectedAccounts(accountsServices))
+		r.Delete("/user/accounts/{provider}", handlers.UnlinkExternalLogin(userServices, accountsServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

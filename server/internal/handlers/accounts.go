@@ -6,6 +6,8 @@ import (
 	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func FindConnectedAccounts(accountsServices *services.AccountsServices) http.HandlerFunc {
@@ -23,5 +25,41 @@ func FindConnectedAccounts(accountsServices *services.AccountsServices) http.Han
 		}
 
 		utils.JSONResponse(w, http.StatusOK, types.FilterConnectedAccount(accounts))
+	}
+}
+
+func UnlinkExternalLogin(userServices *services.UserServices, accountsServices *services.AccountsServices) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value(middlewares.UserContextKey).(string)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		provider := chi.URLParam(r, "provider")
+
+		if provider == "" {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Provider is required"})
+			return
+		}
+
+		user, err := userServices.GetUserByID(userID)
+		if err != nil {
+			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			return
+		}
+
+		if !user.HasPassword {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "You can't remove external login, cuz your don't have password"})
+			return
+		}
+
+		err = accountsServices.UnlinkExternalLogin(userID, provider)
+		if err != nil {
+			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			return
+		}
+
+		utils.JSONResponse(w, http.StatusOK, map[string]string{"message": provider + " has been unlinked"})
 	}
 }

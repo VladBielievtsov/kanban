@@ -39,3 +39,15 @@ func (s *AccountsServices) GetConnectedAccountsByUserID(userID string) ([]types.
 
 	return externalLogin, nil
 }
+
+func (s *AccountsServices) UnlinkExternalLogin(userID, provider string) error {
+	err := s.db.Where("user_id = ? AND provider = ?", userID, provider).Delete(&types.ExternalLogin{}).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("external login not found")
+		}
+		return err
+	}
+
+	return nil
+}
