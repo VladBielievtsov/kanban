@@ -18,7 +18,7 @@ type UserStore = {
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => Promise<AxiosResponse<any, any> | string>;
   setUser: () => Promise<void>;
   updateAvatar: (
     formData: FormData
@@ -75,7 +75,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
       if (res.status === 200) {
         set({ user: res.data, loading: false, error: null });
-        console.log(res.data);
       } else {
         set({
           loading: false,
@@ -88,8 +87,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   async logout() {
-    set({ loading: true, error: null });
-
     try {
       const res = await axios.post(
         "http://localhost:4000/logout",
@@ -98,13 +95,15 @@ export const useUserStore = create<UserStore>((set, get) => ({
       );
 
       if (res.status === 200) {
-        set({ loading: false, user: null, error: null });
+        set({ user: null });
+        return res;
       } else {
-        set({ loading: false, error: res.data.message || "Failed logout" });
+        set({ error: res.data.message || "Failed logout" });
+        return res;
       }
     } catch (error) {
       const errorMessage = handleAxiosErrorMessage(error);
-      set({ loading: false, error: errorMessage });
+      throw new Error(errorMessage);
     }
   },
   async updateAvatar(formData) {
