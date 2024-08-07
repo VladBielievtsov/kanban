@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"kanban-api/internal/config"
 	"kanban-api/internal/middlewares"
 	"kanban-api/internal/services"
 	"kanban-api/internal/types"
@@ -61,5 +62,25 @@ func UnlinkExternalLogin(userServices *services.UserServices, accountsServices *
 		}
 
 		utils.JSONResponse(w, http.StatusOK, map[string]string{"message": provider + " has been unlinked"})
+	}
+}
+
+func LinkExternalLogin(cfg *config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		provider := chi.URLParam(r, "provider")
+
+		if provider == "" {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Provider is required"})
+			return
+		}
+
+		if provider == "github" {
+			githubOauthConfig := GetGithubOauthConfig(cfg)
+			url := githubOauthConfig.AuthCodeURL("link")
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			return
+		}
+
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Unsupported provider"})
 	}
 }

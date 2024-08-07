@@ -51,7 +51,7 @@ func main() {
 	// AUTH
 	r.Post("/login", handlers.Login(authServices))
 	r.Get("/github/login", handlers.GithubLogin(cfg))
-	r.Get("/auth/callback", handlers.GitHubCallback(cfg, authServices))
+	r.Get("/auth/callback", handlers.GitHubCallback(cfg, authServices, accountsServices))
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Get("/me", handlers.GetMe(userServices))
@@ -74,6 +74,7 @@ func main() {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Get("/user/accounts", handlers.FindConnectedAccounts(accountsServices))
 		r.Delete("/user/accounts/{provider}", handlers.UnlinkExternalLogin(userServices, accountsServices))
+		r.Get("/user/link/{provider}", handlers.LinkExternalLogin(cfg))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

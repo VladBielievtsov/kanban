@@ -17,6 +17,7 @@ import {
   useToast,
 } from "@/components/ui";
 import { useConnectedAccountsStore } from "@/store/connectedAccounts";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 export default function ConnectedAccounts() {
@@ -99,8 +100,10 @@ export default function ConnectedAccounts() {
         </div>
       ) : (
         <div>
-          <Button disabled={loading}>
-            {loading ? <LoadingSpinner /> : "Connect account"}
+          <Button disabled={loading} asChild>
+            <Link href={process.env.NEXT_PUBLIC_BACKEND + "/user/link/github"}>
+              {loading ? <LoadingSpinner /> : "Connect account"}
+            </Link>
           </Button>
         </div>
       )}

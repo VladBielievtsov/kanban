@@ -17,7 +17,7 @@ import (
 	"golang.org/x/oauth2/github"
 )
 
-func getGithubOauthConfig(cfg *config.Config) *oauth2.Config {
+func GetGithubOauthConfig(cfg *config.Config) *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
@@ -28,38 +28,60 @@ func getGithubOauthConfig(cfg *config.Config) *oauth2.Config {
 
 func GithubLogin(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		githubOauthConfig := getGithubOauthConfig(cfg)
-		url := githubOauthConfig.AuthCodeURL(cfg.OAuth.OauthState)
+		githubOauthConfig := GetGithubOauthConfig(cfg)
+		url := githubOauthConfig.AuthCodeURL("login")
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	}
 }
 
-func GitHubCallback(cfg *config.Config, authServices *services.AuthServices) http.HandlerFunc {
+func GitHubCallback(cfg *config.Config, authServices *services.AuthServices, accountsServices *services.AccountsServices) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		githubOauthConfig := getGithubOauthConfig(cfg)
-		userInfo, err := authServices.GetGithubUser(w, r, githubOauthConfig, cfg.OAuth.OauthState)
+		githubOauthConfig := GetGithubOauthConfig(cfg)
+		state := r.URL.Query().Get("state")
+
+		if state == "" {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "State is missing"})
+			return
+		}
+
+		userInfo, err := authServices.GetGithubUser(w, r, githubOauthConfig)
 		if err != nil {
 			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
 			return
 		}
 
-		_, token, err := authServices.AuthByGithub(userInfo)
-		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
-			return
+		switch state {
+		case "login":
+			_, token, err := authServices.AuthByGithub(userInfo)
+			if err != nil {
+				utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+				return
+			}
+
+			http.SetCookie(w, &http.Cookie{
+				Name:     "auth_token",
+				Value:    token,
+				Expires:  time.Now().UTC().Add(120 * time.Minute),
+				HttpOnly: true,
+				Secure:   true,
+				SameSite: http.SameSiteLaxMode,
+				Path:     "/",
+			})
+
+			http.Redirect(w, r, cfg.Application.Client, http.StatusFound)
+		case "link":
+			userID := middlewares.GetUserIdFromCookie(w, r, cfg.Application.JwtSecret)
+
+			err = accountsServices.LinkGithubAccount(userID, userInfo)
+			if err != nil {
+				utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+				return
+			}
+
+			http.Redirect(w, r, cfg.Application.Client+"/profile", http.StatusFound)
+		default:
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid flow"})
 		}
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     "auth_token",
-			Value:    token,
-			Expires:  time.Now().UTC().Add(120 * time.Minute),
-			HttpOnly: true,
-			Secure:   true,
-			SameSite: http.SameSiteLaxMode,
-			Path:     "/",
-		})
-
-		http.Redirect(w, r, cfg.Application.Client, http.StatusFound)
 	}
 }
 

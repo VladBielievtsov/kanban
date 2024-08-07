@@ -30,12 +30,7 @@ func NewAuthServices(cfg *config.Config, db *gorm.DB) *AuthServices {
 	}
 }
 
-func (s *AuthServices) GetGithubUser(w http.ResponseWriter, r *http.Request, githubOauthConfig *oauth2.Config, oauthStateString string) (types.GithubResponse, error) {
-	state := r.URL.Query().Get("state")
-	if state != oauthStateString {
-		msg := fmt.Errorf("invalid oauth state, expected '%s', got '%s'", oauthStateString, state)
-		return types.GithubResponse{}, msg
-	}
+func (s *AuthServices) GetGithubUser(w http.ResponseWriter, r *http.Request, githubOauthConfig *oauth2.Config) (types.GithubResponse, error) {
 
 	errorRes := r.URL.Query().Has("error")
 	if errorRes {
