@@ -1,21 +1,21 @@
 "use client";
 import React from "react";
 import { Button } from "./ui";
-import { axiosClient } from "@/lib/axios-client";
+import { useBoardsStore } from "@/store/boards";
+import { useRouter } from "next/navigation";
 
 export default function CreateBoard() {
-  const createBoard = async () => {
-    const data = await axiosClient.post(
-      "/board",
-      {},
-      { withCredentials: true }
-    );
+  const { createBoard } = useBoardsStore();
+  const router = useRouter();
 
-    if (data.status === 200) {
-      console.log(data);
+  const onCreate = async () => {
+    const res = await createBoard();
+    if (typeof res !== "string" && res.data) {
+      router.push("/boards/" + res.data.id);
     } else {
-      console.log("Err: " + data);
+      console.error(res);
     }
   };
-  return <Button onClick={createBoard}>Create</Button>;
+
+  return <Button onClick={onCreate}>Create</Button>;
 }
