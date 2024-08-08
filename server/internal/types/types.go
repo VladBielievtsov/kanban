@@ -16,6 +16,8 @@ type User struct {
 	Email       string     `gorm:"type:varchar(255);unique;not null" json:"email"`
 	CreatedAt   *time.Time `gorm:"not null;default:now()" json:"createdAt"`
 	UpdatedAt   *time.Time `gorm:"not null;default:now()" json:"updatedAt"`
+
+	Boards []Board `gorm:"foreignKey:UserID" json:"boards"`
 }
 
 type UserResponse struct {
@@ -103,4 +105,16 @@ type ChangeNameBody struct {
 type ChangePasswordBody struct {
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"password"`
+}
+
+// Board
+
+type Board struct {
+	ID          *uuid.UUID `gorm:"type:uuid;not null;primaryKey" json:"id"`
+	Title       string     `gorm:"varchar(255);not null" json:"title"`
+	UserID      *uuid.UUID `gorm:"type:uuid;not null" json:"user_id"`
+	Icon        string     `gorm:"varchar(255);not null" json:"icon"`
+	Description string     `gorm:"varchar(255);not null" json:"description"`
+	CreatedAt   *time.Time `gorm:"not null;default:now()" json:"createdAt"`
+	UpdatedAt   *time.Time `gorm:"not null;default:now()" json:"updatedAt"`
 }

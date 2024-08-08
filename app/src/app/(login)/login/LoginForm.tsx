@@ -38,7 +38,7 @@ export default function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "mail@mail.com",
+      email: "",
       password: "",
     },
   });
@@ -127,6 +127,20 @@ export default function LoginForm() {
                 <span>Log in with Github</span>
               </Link>
             </Button>
+            {/* <Button
+              type="button"
+              className="w-full"
+              onClick={() =>
+                window.open(
+                  `${process.env.NEXT_PUBLIC_BACKEND}/github/login`,
+                  "_blank",
+                  "width=500,height=600"
+                )
+              }
+            >
+              <Github />
+              <span>Log in with Github</span>
+            </Button> */}
           </div>
         </form>
       </Form>

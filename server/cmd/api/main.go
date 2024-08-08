@@ -47,6 +47,7 @@ func main() {
 	userServices := services.NewUserServices(cfg, db)
 	authServices := services.NewAuthServices(cfg, db)
 	accountsServices := services.NewAccountsServices(cfg, db)
+	boardServices := services.NewBoardServices(cfg, db)
 
 	// AUTH
 	r.Post("/login", handlers.Login(authServices))
@@ -75,6 +76,13 @@ func main() {
 		r.Get("/user/accounts", handlers.FindConnectedAccounts(accountsServices))
 		r.Delete("/user/accounts/{provider}", handlers.UnlinkExternalLogin(userServices, accountsServices))
 		r.Get("/user/link/{provider}", handlers.LinkExternalLogin(cfg))
+	})
+
+	// Board
+
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
+		r.Post("/board", handlers.CreateBoard(boardServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

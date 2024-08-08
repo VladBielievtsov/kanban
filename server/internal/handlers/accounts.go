@@ -51,7 +51,7 @@ func UnlinkExternalLogin(userServices *services.UserServices, accountsServices *
 		}
 
 		if !user.HasPassword {
-			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "You can't remove external login, cuz your don't have password"})
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "You can't remove external login, cuz you don't have password"})
 			return
 		}
 
