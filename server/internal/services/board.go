@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
+	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -29,7 +31,7 @@ func (s *BoardServices) CreateBoard(userID *uuid.UUID) (types.Board, error) {
 		ID:          &id,
 		UserID:      userID,
 		Title:       "Untitled",
-		Description: "",
+		Description: "Add description here",
 		Icon:        "📑",
 	}
 
@@ -62,4 +64,46 @@ func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, error
 	}
 
 	return "The board has been successfully delete", nil
+}
+
+func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (types.Board, int, error) {
+	board := types.Board{}
+
+	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board)
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		return board, http.StatusNotFound, fmt.Errorf("failed to find the board: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return board, http.StatusNotFound, fmt.Errorf("no board found with the specified ID for this user")
+	}
+
+	return board, http.StatusOK, nil
+}
+
+func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req types.UpdateBoardBody) (types.Board, error) {
+	board := types.Board{}
+
+	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board)
+	if result.Error != nil {
+		return board, fmt.Errorf("failed to find the board: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return board, fmt.Errorf("no board found with the specified ID for this user")
+	}
+
+	if strings.TrimSpace(req.Title) != "" {
+		board.Title = req.Title
+	}
+	if strings.TrimSpace(req.Description) != "" {
+		board.Description = req.Description
+	}
+
+	if err := s.db.Save(&board).Error; err != nil {
+		return board, fmt.Errorf("failed to update the board: %v", err)
+	}
+
+	return board, nil
 }

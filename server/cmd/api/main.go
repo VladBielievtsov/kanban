@@ -85,6 +85,7 @@ func main() {
 		r.Post("/board", handlers.CreateBoard(boardServices))
 		r.Get("/boards", handlers.GetAllBoards(boardServices))
 		r.Delete("/board/{id}", handlers.DeleteBoard(boardServices))
+		r.Get("/board/{id}", handlers.GetBoardByID(boardServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

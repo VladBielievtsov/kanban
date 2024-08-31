@@ -115,6 +115,11 @@ type Board struct {
 	UserID      *uuid.UUID `gorm:"type:uuid;not null" json:"user_id"`
 	Icon        string     `gorm:"varchar(255);not null" json:"icon"`
 	Description string     `gorm:"varchar(255);not null" json:"description"`
-	CreatedAt   *time.Time `gorm:"not null;default:now()" json:"createdAt"`
-	UpdatedAt   *time.Time `gorm:"not null;default:now()" json:"updatedAt"`
+	CreatedAt   time.Time  `gorm:"not null;autoCreateTime" json:"createdAt"`
+	UpdatedAt   time.Time  `gorm:"not null;autoUpdateTime" json:"updatedAt"`
+}
+
+type UpdateBoardBody struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
