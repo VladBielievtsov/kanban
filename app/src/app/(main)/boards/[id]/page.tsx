@@ -6,7 +6,7 @@ import Kanban from "./Kanban";
 export default function page({ params }: { params: { id: string } }) {
   return (
     <div className="p-4">
-      <BoardInfo />
+      <BoardInfo borderId={params.id} />
       <Kanban borderId={params.id} />
     </div>
   );

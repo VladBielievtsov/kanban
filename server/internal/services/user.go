@@ -72,6 +72,13 @@ func (s *UserServices) UploadAvatar(w http.ResponseWriter, r *http.Request, user
 	}
 	defer file.Close()
 
+	if err := utils.EnsureDirExists("uploads"); err != nil {
+		return "", fmt.Errorf("failed to ensure uploads directory exists: %w", err)
+	}
+	if err := utils.EnsureDirExists(filepath.Join("uploads", "avatars")); err != nil {
+		return "", fmt.Errorf("failed to ensure avatars directory exists: %w", err)
+	}
+
 	fileExt := filepath.Ext(header.Filename)
 	if fileExt == "" {
 		fileExt = ".jpg"

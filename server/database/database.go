@@ -39,35 +39,3 @@ func Migrate(db *gorm.DB) error {
 	log.Println("Database migrated successfully")
 	return nil
 }
-
-// func createDefaultUser() {
-
-// 	var count int64
-// 	DB.Model(&types.User{}).Count(&count)
-
-// 	if count == 0 {
-// 		hashedPassword, err := utils.HashPassword("password")
-// 		if err != nil {
-// 			utils.ErrorHandler(err)
-// 		}
-
-// 		id := uuid.New()
-// 		defaultUser := types.User{
-// 			ID:        &id,
-// 			Password:  hashedPassword,
-// 			FirstName: "FirstName",
-// 			LastName:  "LastName",
-// 			Email:     "mail@mail.com",
-// 			AvatarURL: "/uploads/default/avatar.png",
-// 		}
-// 		result := DB.FirstOrCreate(&types.User{}, defaultUser)
-// 		if result.Error != nil {
-// 			utils.ErrorHandler(err)
-// 		}
-// 		fmt.Println("Default user created successfully!")
-// 		fmt.Println("====================")
-// 		fmt.Println("Email: mail@mail.com")
-// 		fmt.Println("Password: password")
-// 		fmt.Println("====================")
-// 	}
-// }

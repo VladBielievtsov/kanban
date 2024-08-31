@@ -1,5 +1,5 @@
 postgres_host: "localhost"
-postgres_port: "5432"
+postgres_port: "5433"
 postgres_db: "kanban"
 postgres_user: "postgres"
 postgres_password: "password"

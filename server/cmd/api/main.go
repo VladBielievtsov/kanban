@@ -83,6 +83,8 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Post("/board", handlers.CreateBoard(boardServices))
+		r.Get("/boards", handlers.GetAllBoards(boardServices))
+		r.Delete("/board/{id}", handlers.DeleteBoard(boardServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

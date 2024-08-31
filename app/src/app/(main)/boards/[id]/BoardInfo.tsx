@@ -1,25 +1,17 @@
 "use client";
 
-import { CornerUpLeft, Star, Trash2 } from "lucide-react";
+import { CornerUpLeft, Star } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import EmojiPicker from "./EmojiPicker";
 import Link from "next/link";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button,
-  Input,
-  Textarea,
-} from "@/components/ui";
+import { Button, Input, Textarea } from "@/components/ui";
+import DeleteBoard from "@/components/DeleteBoard";
 
-export default function BoardInfo() {
+interface Props {
+  borderId: string;
+}
+
+export default function BoardInfo({ borderId }: Props) {
   const [isFavorites, setIsFavorites] = useState(false);
   const [content, setContent] = useState("Add description here");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -59,26 +51,7 @@ export default function BoardInfo() {
           </Button>
         </div>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant={"ghost"}>
-              <Trash2 />
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Continue</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <DeleteBoard id={borderId} />
       </div>
       <div className="px-10 pt-4">
         <div className="inline-block">
