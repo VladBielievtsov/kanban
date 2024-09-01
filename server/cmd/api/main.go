@@ -48,6 +48,7 @@ func main() {
 	authServices := services.NewAuthServices(cfg, db)
 	accountsServices := services.NewAccountsServices(cfg, db)
 	boardServices := services.NewBoardServices(cfg, db)
+	sectionServices := services.NewSectionServices(cfg, db)
 
 	// AUTH
 	r.Post("/login", handlers.Login(authServices))
@@ -87,6 +88,13 @@ func main() {
 		r.Delete("/board/{id}", handlers.DeleteBoard(boardServices))
 		r.Get("/board/{id}", handlers.GetBoardByID(boardServices))
 		r.Patch("/board/{id}", handlers.UpdateBoard(boardServices))
+	})
+
+	// SECTION
+
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
+		r.Post("/section/{board-id}", handlers.CreateSection(sectionServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)
