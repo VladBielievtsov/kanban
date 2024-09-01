@@ -100,6 +100,9 @@ func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req types.Upda
 	if strings.TrimSpace(req.Description) != "" {
 		board.Description = req.Description
 	}
+	if strings.TrimSpace(req.Icon) != "" {
+		board.Icon = req.Icon
+	}
 
 	if err := s.db.Save(&board).Error; err != nil {
 		return board, fmt.Errorf("failed to update the board: %v", err)

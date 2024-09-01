@@ -1,15 +1,9 @@
 import { Metadata } from "next";
 import React from "react";
-import BoardInfo from "./BoardInfo";
-import Kanban from "./Kanban";
+import Board from "./Board";
 
 export default function page({ params }: { params: { id: string } }) {
-  return (
-    <div className="p-4">
-      <BoardInfo borderId={params.id} />
-      <Kanban borderId={params.id} />
-    </div>
-  );
+  return <Board id={params.id} />;
 }
 
 export const metadata: Metadata = {

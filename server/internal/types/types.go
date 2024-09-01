@@ -122,4 +122,5 @@ type Board struct {
 type UpdateBoardBody struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Icon        string `json:"icon"`
 }

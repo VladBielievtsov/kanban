@@ -33,7 +33,7 @@ func main() {
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{cfg.Application.Client},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
 	})
@@ -78,7 +78,7 @@ func main() {
 		r.Get("/user/link/{provider}", handlers.LinkExternalLogin(cfg))
 	})
 
-	// Board
+	// BOARD
 
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
@@ -86,6 +86,7 @@ func main() {
 		r.Get("/boards", handlers.GetAllBoards(boardServices))
 		r.Delete("/board/{id}", handlers.DeleteBoard(boardServices))
 		r.Get("/board/{id}", handlers.GetBoardByID(boardServices))
+		r.Patch("/board/{id}", handlers.UpdateBoard(boardServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

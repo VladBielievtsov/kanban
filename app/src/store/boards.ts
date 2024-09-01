@@ -19,6 +19,12 @@ type BoardsStore = {
   createBoard: () => Promise<AxiosResponse<any> | string>;
   allBoards: () => Promise<AxiosResponse<any>>;
   deleteBoard: (id: string) => Promise<AxiosResponse<any>>;
+  updateBoard: (
+    id: string,
+    title: string,
+    description: string,
+    icon: string
+  ) => Promise<AxiosResponse<any>>;
 };
 
 export const useBoardsStore = create<BoardsStore>((set) => ({
@@ -66,7 +72,6 @@ export const useBoardsStore = create<BoardsStore>((set) => ({
       }
     } catch (error) {
       const errorMessage = handleAxiosErrorMessage(error);
-      set({ error: errorMessage, loading: false });
       throw new Error(errorMessage);
     }
   },
@@ -87,7 +92,34 @@ export const useBoardsStore = create<BoardsStore>((set) => ({
       }
     } catch (error) {
       const errorMessage = handleAxiosErrorMessage(error);
-      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
+    }
+  },
+
+  async updateBoard(id, title, description, icon) {
+    try {
+      const res = await axiosClient.patch(
+        "/board/" + id,
+        {
+          title,
+          description,
+          icon,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        set((state) => ({
+          boards: state.boards?.map((board) =>
+            board.id === id ? { ...board, title, description, icon } : board
+          ),
+        }));
+        return res;
+      } else {
+        return res;
+      }
+    } catch (error) {
+      const errorMessage = handleAxiosErrorMessage(error);
       throw new Error(errorMessage);
     }
   },
