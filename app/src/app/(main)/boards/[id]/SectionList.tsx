@@ -1,10 +1,10 @@
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { IData } from "./Kanban";
 import SectionItem from "./SectionItem";
+import { Sections } from "@/store/boards";
 
 interface Props {
-  data: IData[];
-  setData: React.Dispatch<React.SetStateAction<IData[]>>;
+  data: Sections[];
+  setData: React.Dispatch<React.SetStateAction<Sections[]>>;
 }
 
 export default function SectionList({ data, setData }: Props) {
@@ -37,19 +37,23 @@ export default function SectionList({ data, setData }: Props) {
     setData(data);
   };
 
+  const tasks = data.map((d) => ({ ...d, tasks: [] }));
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
         className="flex items-start overflow-x-auto"
         style={{ width: "calc(100vw - 432px)" }}
       >
-        {data.map((section) => (
+        {data.map((section, key) => (
           <SectionItem
+            key={section.id}
             id={section.id}
             title={section.title}
+            boardID={section.board_id}
             data={data}
             setData={setData}
-            tasks={section.tasks}
+            tasks={tasks[key].tasks}
           />
         ))}
       </div>

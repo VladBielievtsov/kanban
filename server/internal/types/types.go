@@ -136,3 +136,7 @@ type Section struct {
 	CreatedAt time.Time  `gorm:"not null;autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time  `gorm:"not null;autoUpdateTime" json:"updatedAt"`
 }
+
+type UpdateSectionBody struct {
+	Title string `json:"title"`
+}

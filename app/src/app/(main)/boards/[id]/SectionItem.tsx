@@ -1,46 +1,38 @@
 import { Draggable, Droppable } from "react-beautiful-dnd";
-import { Button, Input } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { Plus, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
 import DeleteSection from "@/components/DeleteSection";
-import { IData, ITask } from "./Kanban";
+import { ITask, Sections } from "@/store/boards";
+import SectionControls from "./SectionControls";
 
 interface Props {
   id: string;
   title: string;
-  data: IData[];
-  setData: React.Dispatch<React.SetStateAction<IData[]>>;
+  boardID: string;
+  data: Sections[];
+  setData: React.Dispatch<React.SetStateAction<Sections[]>>;
   tasks: ITask[];
 }
 
 export default function SectionItem({
   id,
   title,
+  boardID,
   data,
   setData,
   tasks,
 }: Props) {
-  const updateSectionTitle = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    sectionId: string
-  ) => {
-    const newTitle = e.target.value;
-    const newData = [...data];
-    const index = newData.findIndex((e) => e.id === sectionId);
-    newData[index].title = newTitle;
-    setData(newData);
-  };
-
-  const addTask = (sectionId: string) => {
-    const newData = [...data];
-    const index = newData.findIndex((e) => e.id === sectionId);
-    newData[index].tasks.push({
-      id: new Date().toISOString(),
-      title: "",
-    });
-    setData(newData);
-  };
+  // const addTask = (sectionId: string) => {
+  //   const newData = [...data];
+  //   const index = newData.findIndex((e) => e.id === sectionId);
+  //   newData[index].tasks.push({
+  //     id: new Date().toISOString(),
+  //     title: "",
+  //   });
+  //   setData(newData);
+  // };
 
   return (
     <div key={id} className="w-[300px]">
@@ -52,15 +44,11 @@ export default function SectionItem({
             className="w-[300px] p-2 mr-2"
           >
             <div className="flex items-center justify-between mb-2">
-              <Input
-                value={title}
-                onChange={(e) => updateSectionTitle(e, id)}
-                className="rounded-r-none"
-              />
+              <SectionControls title={title} sectionID={id} boardID={boardID} />
               <Button
                 variant={"outline"}
                 className="bg-transparent rounded-none"
-                onClick={() => addTask(id)}
+                // onClick={() => addTask(id)}
               >
                 <Plus size={18} />
               </Button>

@@ -1,34 +1,44 @@
 "use client";
 
-import { Button, Separator } from "@/components/ui";
+import { Button, Separator, useToast } from "@/components/ui";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SectionList from "./SectionList";
+import { Sections, useBoardsStore } from "@/store/boards";
 
-interface KanbanProps {
-  borderId: string;
+interface Props {
+  boardId: string;
 }
 
-export interface IData {
-  id: string;
-  title: string;
-  tasks: ITask[];
-}
+export default function Kanban({ boardId }: Props) {
+  const [data, setData] = useState<Sections[]>([]);
+  const { createSection, getAllSections } = useBoardsStore();
 
-export interface ITask {
-  id: string;
-  title: string;
-}
+  const { toast } = useToast();
 
-export default function Kanban({ borderId }: KanbanProps) {
-  const [data, setData] = useState<IData[]>([]);
-
-  const addSection = () => {
-    setData((prev) => [
-      ...prev,
-      { id: new Date().toISOString(), title: "Untitled", tasks: [] },
-    ]);
+  const addSection = async () => {
+    const res = await createSection(boardId);
+    if (res.status === 200) {
+      toast({
+        title: "The section has been successfully created.",
+        variant: "success",
+      });
+      setData((prev) => [...prev, res.data]);
+    } else {
+      toast({
+        title: res.data,
+        variant: "destructive",
+      });
+      console.log(res);
+    }
   };
+
+  useEffect(() => {
+    const sections = getAllSections(boardId);
+    sections.then((res) => {
+      setData(res);
+    });
+  });
 
   return (
     <div className="px-10">

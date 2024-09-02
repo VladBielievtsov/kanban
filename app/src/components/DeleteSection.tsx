@@ -1,3 +1,4 @@
+import { Sections } from "@/store/boards";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,13 +12,12 @@ import {
   Button,
 } from "./ui";
 import { Trash2 } from "lucide-react";
-import { IData } from "@/app/(main)/boards/[id]/Kanban";
 
 interface Props {
   id: string;
   title: string;
-  data: IData[];
-  setData: React.Dispatch<React.SetStateAction<IData[]>>;
+  data: Sections[];
+  setData: React.Dispatch<React.SetStateAction<Sections[]>>;
 }
 
 export default function DeleteSection({ id, title, data, setData }: Props) {

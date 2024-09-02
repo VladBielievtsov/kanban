@@ -95,6 +95,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Post("/section/{board-id}", handlers.CreateSection(sectionServices))
+		r.Patch("/section/{section-id}", handlers.UpdateSectionTitle(sectionServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

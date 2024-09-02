@@ -30,6 +30,7 @@ export default function Board({ id }: Props) {
         setDescription(res.data.description);
         setTitle(res.data.title);
         setIcon(res.data.icon);
+        console.log(res);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -50,7 +51,7 @@ export default function Board({ id }: Props) {
       {!loading ? (
         <>
           <BoardInfo
-            borderId={id}
+            boardId={id}
             description={description}
             title={title}
             icon={icon}
@@ -58,7 +59,7 @@ export default function Board({ id }: Props) {
             setTitle={setTitle}
             setIcon={setIcon}
           />
-          <Kanban borderId={id} />
+          <Kanban boardId={id} />
         </>
       ) : (
         <div className="p-4 flex items-center justify-center">

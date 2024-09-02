@@ -1,14 +1,7 @@
 "use client";
 
 import { CornerUpLeft, Star } from "lucide-react";
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import EmojiPicker from "./EmojiPicker";
 import Link from "next/link";
 import { Button, Input, Textarea, useToast } from "@/components/ui";
@@ -18,7 +11,7 @@ import { useBoardsStore } from "@/store/boards";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 
 interface Props {
-  borderId: string;
+  boardId: string;
   description: string;
   title: string;
   icon: string;
@@ -28,7 +21,7 @@ interface Props {
 }
 
 export default function BoardInfo({
-  borderId,
+  boardId,
   description,
   title,
   icon,
@@ -67,14 +60,6 @@ export default function BoardInfo({
     }
   }, [description]);
 
-  const handleChangeDesc = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
-  };
-
-  const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
-
   useDebounce(
     () => {
       setDebouncedTitle(title);
@@ -102,7 +87,7 @@ export default function BoardInfo({
     ) {
       setDefaultValues({ title, description, icon: ic });
       setLoading(true);
-      const res = await updateBoard(borderId, title, description, ic);
+      const res = await updateBoard(boardId, title, description, ic);
       if (res.status === 200) {
         setLoading(false);
         toast({
@@ -143,7 +128,7 @@ export default function BoardInfo({
             </Button>
           </div>
 
-          <DeleteBoard id={borderId} />
+          <DeleteBoard id={boardId} />
         </div>
         <div className="px-10 pt-4">
           <div className="inline-block">
@@ -151,13 +136,13 @@ export default function BoardInfo({
           </div>
           <Input
             value={title}
-            onChange={handleChangeTitle}
+            onChange={(e) => setTitle(e.target.value)}
             className="p-0 my-2 text-4xl focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent border-0"
           />
           <Textarea
             ref={textareaRef}
             value={description}
-            onChange={handleChangeDesc}
+            onChange={(e) => setDescription(e.target.value)}
             rows={1}
             className="p-0 mb-4 mt-4 overflow-hidden resize-none text-lg focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent border-0"
           />

@@ -8,6 +8,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func ConnectDatabase() (*gorm.DB, error) {
@@ -21,7 +22,9 @@ func ConnectDatabase() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, name, port)
 
 	var err error
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connetc to the Database: %v", err)
 	}
@@ -31,7 +34,7 @@ func ConnectDatabase() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&types.User{}, &types.ExternalLogin{}, &types.Board{})
+	err := db.AutoMigrate(&types.User{}, &types.ExternalLogin{}, &types.Board{}, &types.Section{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}
