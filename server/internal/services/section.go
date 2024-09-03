@@ -29,7 +29,7 @@ func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (types.Secti
 
 	boardUUID, err := uuid.Parse(boardID)
 	if err != nil {
-		return section, http.StatusBadRequest, fmt.Errorf("invalid board ID: %v", err)
+		return section, http.StatusBadRequest, fmt.Errorf("invalid section ID: %v", err)
 	}
 
 	section = types.Section{
