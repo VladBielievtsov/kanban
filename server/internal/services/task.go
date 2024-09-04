@@ -22,7 +22,7 @@ func NewTaskServices(cfg *config.Config, db *gorm.DB) *TaskServices {
 	}
 }
 
-func (s *TaskServices) Create(userID *uuid.UUID, sectionID string) (types.Task, int, error) {
+func (s *TaskServices) Create(userID uuid.UUID, sectionID string) (types.Task, int, error) {
 	task := types.Task{}
 	id := uuid.New()
 
@@ -32,15 +32,15 @@ func (s *TaskServices) Create(userID *uuid.UUID, sectionID string) (types.Task, 
 	}
 
 	var tasksCount int64
-	if err := s.db.Where("section_id = ?", sectionID).Find(&task).Count(&tasksCount).Error; err != nil {
-		return task, http.StatusNotFound, fmt.Errorf("failed to find the tasks: %v", err)
+	if err := s.db.Model(&types.Task{}).Where("section_id = ?", sectionID).Count(&tasksCount).Error; err != nil {
+		return task, http.StatusNotFound, fmt.Errorf("failed to count tasks: %v", err)
 	}
 
 	task = types.Task{
-		ID:        &id,
+		ID:        id,
 		Title:     "Untitled",
 		UserID:    userID,
-		SectionID: &sectionUUID,
+		SectionID: sectionUUID,
 		Content:   "",
 		Position:  int(tasksCount),
 	}

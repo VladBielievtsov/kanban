@@ -1,9 +1,7 @@
 import axios from "axios";
 
-// process.env.API_BASE_URL
-
 export const axiosClient = axios.create({
-  baseURL: "http://localhost:4000",
+  baseURL: process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000",
 });
 
 export function handleAxiosErrorMessage(error: unknown) {

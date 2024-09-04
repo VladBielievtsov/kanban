@@ -34,7 +34,7 @@ func ConnectDatabase() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&types.User{}, &types.ExternalLogin{}, &types.Board{}, &types.Section{})
+	err := db.AutoMigrate(&types.User{}, &types.ExternalLogin{}, &types.Board{}, &types.Section{}, &types.Task{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}

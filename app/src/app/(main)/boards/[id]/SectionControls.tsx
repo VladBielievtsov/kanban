@@ -1,9 +1,10 @@
-import { Input, useToast } from "@/components/ui";
+import { Button, Input, useToast } from "@/components/ui";
 import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
-import { useBoardsStore } from "@/store/boards";
 import { useState } from "react";
 import { useDebounce } from "react-use";
 import { Sections } from "./Kanban";
+import { Plus } from "lucide-react";
+import CreateTask from "@/components/CreateTask";
 
 interface Props {
   title: string;
@@ -70,10 +71,17 @@ export default function SectionControls({
   };
 
   return (
-    <Input
-      value={newTitle}
-      onChange={(e) => setNewTitle(e.target.value)}
-      className="rounded-r-none"
-    />
+    <>
+      <Input
+        value={newTitle}
+        onChange={(e) => setNewTitle(e.target.value)}
+        className="rounded-r-none"
+      />
+      <CreateTask
+        sectionID={sectionID}
+        sections={sections}
+        setSections={setSections}
+      />
+    </>
   );
 }

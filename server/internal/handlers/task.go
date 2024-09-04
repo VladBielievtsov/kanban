@@ -30,7 +30,7 @@ func CreateTask(taskServices *services.TaskServices) http.HandlerFunc {
 			return
 		}
 
-		task, status, err := taskServices.Create(&id, sectionID)
+		task, status, err := taskServices.Create(id, sectionID)
 		if err != nil {
 			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return

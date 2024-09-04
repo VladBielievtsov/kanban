@@ -70,7 +70,9 @@ func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (types.Board,
 	board := types.Board{}
 
 	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).Preload("Sections", func(db *gorm.DB) *gorm.DB {
-		return db.Order("created_at ASC")
+		return db.Order("created_at ASC").Preload("Tasks", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at ASC")
+		})
 	}).First(&board)
 	if result.Error != nil {
 		fmt.Println(result.Error)

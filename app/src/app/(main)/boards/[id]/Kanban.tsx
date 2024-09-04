@@ -2,9 +2,8 @@
 
 import { Button, Separator, useToast } from "@/components/ui";
 
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import SectionList from "./SectionList";
-import { useBoardsStore } from "@/store/boards";
 import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 

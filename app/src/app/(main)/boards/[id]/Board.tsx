@@ -31,12 +31,26 @@ export default function Board({ id }: Props) {
         setDescription(res.data.description);
         setTitle(res.data.title);
         setIcon(res.data.icon);
-        setSections(res.data.sections);
+        const newArr: Sections[] = res.data.sections.map(
+          (section: Sections) => ({
+            ...section,
+            tasks: section.tasks.map((task) => ({
+              id: task.id,
+              title: task.title,
+            })),
+          })
+        );
+        setSections(newArr);
+      } else {
+        console.log(res);
+
+        setLoading(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.request.status === 404) {
           setError("failed to find the board: record not found");
+          setLoading(false);
         }
       }
     }
@@ -46,10 +60,14 @@ export default function Board({ id }: Props) {
     getBoard();
   }, []);
 
+  useEffect(() => {
+    sections;
+  }, [sections]);
+
   return (
     <div className="p-4 relative">
       {error && <Alert variant="danger">{error}</Alert>}
-      {!loading ? (
+      {!loading && !error ? (
         <>
           <BoardInfo
             boardId={id}
@@ -63,9 +81,11 @@ export default function Board({ id }: Props) {
           <Kanban boardId={id} sections={sections} setSections={setSections} />
         </>
       ) : (
-        <div className="p-4 flex items-center justify-center">
-          <LoadingSpinner size={32} />
-        </div>
+        !error && (
+          <div className="p-4 flex items-center justify-center">
+            <LoadingSpinner size={32} />
+          </div>
+        )
       )}
     </div>
   );

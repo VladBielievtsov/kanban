@@ -1,7 +1,6 @@
 import { Draggable, Droppable } from "react-beautiful-dnd";
-import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { Plus, SquareArrowOutUpRight } from "lucide-react";
+import { SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
 import DeleteSection from "@/components/DeleteSection";
 import SectionControls from "./SectionControls";
@@ -24,16 +23,6 @@ export default function SectionItem({
   setSections,
   tasks,
 }: Props) {
-  // const addTask = (sectionId: string) => {
-  //   const newData = [...data];
-  //   const index = newData.findIndex((e) => e.id === sectionId);
-  //   newData[index].tasks.push({
-  //     id: new Date().toISOString(),
-  //     title: "",
-  //   });
-  //   setData(newData);
-  // };
-
   return (
     <div key={id} className="w-[300px]">
       <Droppable key={id} droppableId={id}>
@@ -50,13 +39,6 @@ export default function SectionItem({
                 sections={sections}
                 setSections={setSections}
               />
-              <Button
-                variant={"outline"}
-                className="bg-transparent rounded-none"
-                // onClick={() => addTask(id)}
-              >
-                <Plus size={18} />
-              </Button>
               <DeleteSection
                 id={id}
                 title={title}

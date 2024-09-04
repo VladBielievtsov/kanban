@@ -39,15 +39,13 @@ export default function SectionList({ sections, setSections }: Props) {
     setSections(sections);
   };
 
-  const tasks = sections.map((s) => ({ ...s, tasks: [] }));
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
         className="flex items-start overflow-x-auto"
         style={{ width: "calc(100vw - 432px)" }}
       >
-        {sections.map((section, key) => (
+        {sections.map((section) => (
           <SectionItem
             key={section.id}
             id={section.id}
@@ -55,7 +53,7 @@ export default function SectionList({ sections, setSections }: Props) {
             boardID={section.board_id}
             sections={sections}
             setSections={setSections}
-            tasks={tasks[key].tasks}
+            tasks={section.tasks}
           />
         ))}
       </div>
