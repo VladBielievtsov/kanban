@@ -1,4 +1,4 @@
-import { Sections } from "@/store/boards";
+import { Sections } from "@/app/(main)/boards/[id]/Kanban";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,14 +16,19 @@ import { Trash2 } from "lucide-react";
 interface Props {
   id: string;
   title: string;
-  data: Sections[];
-  setData: React.Dispatch<React.SetStateAction<Sections[]>>;
+  sections: Sections[];
+  setSections: React.Dispatch<React.SetStateAction<Sections[]>>;
 }
 
-export default function DeleteSection({ id, title, data, setData }: Props) {
+export default function DeleteSection({
+  id,
+  title,
+  sections,
+  setSections,
+}: Props) {
   const removeSection = (id: string) => {
-    const newData = [...data].filter((s) => s.id !== id);
-    setData(newData);
+    const newData = [...sections].filter((s) => s.id !== id);
+    setSections(newData);
   };
 
   return (

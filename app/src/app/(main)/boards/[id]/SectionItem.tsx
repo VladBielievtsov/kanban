@@ -4,15 +4,15 @@ import { cn } from "@/lib/utils";
 import { Plus, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
 import DeleteSection from "@/components/DeleteSection";
-import { ITask, Sections } from "@/store/boards";
 import SectionControls from "./SectionControls";
+import { ITask, Sections } from "./Kanban";
 
 interface Props {
   id: string;
   title: string;
   boardID: string;
-  data: Sections[];
-  setData: React.Dispatch<React.SetStateAction<Sections[]>>;
+  sections: Sections[];
+  setSections: React.Dispatch<React.SetStateAction<Sections[]>>;
   tasks: ITask[];
 }
 
@@ -20,8 +20,8 @@ export default function SectionItem({
   id,
   title,
   boardID,
-  data,
-  setData,
+  sections,
+  setSections,
   tasks,
 }: Props) {
   // const addTask = (sectionId: string) => {
@@ -44,7 +44,12 @@ export default function SectionItem({
             className="w-[300px] p-2 mr-2"
           >
             <div className="flex items-center justify-between mb-2">
-              <SectionControls title={title} sectionID={id} boardID={boardID} />
+              <SectionControls
+                title={title}
+                sectionID={id}
+                sections={sections}
+                setSections={setSections}
+              />
               <Button
                 variant={"outline"}
                 className="bg-transparent rounded-none"
@@ -55,8 +60,8 @@ export default function SectionItem({
               <DeleteSection
                 id={id}
                 title={title}
-                data={data}
-                setData={setData}
+                sections={sections}
+                setSections={setSections}
               />
             </div>
             {tasks.map((task, idx) => (

@@ -1,19 +1,26 @@
 import { Input, useToast } from "@/components/ui";
+import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 import { useBoardsStore } from "@/store/boards";
 import { useState } from "react";
 import { useDebounce } from "react-use";
+import { Sections } from "./Kanban";
 
 interface Props {
   title: string;
-  boardID: string;
   sectionID: string;
+  sections: Sections[];
+  setSections: React.Dispatch<React.SetStateAction<Sections[]>>;
 }
 
-export default function SectionControls({ title, boardID, sectionID }: Props) {
+export default function SectionControls({
+  title,
+  sectionID,
+  sections,
+  setSections,
+}: Props) {
   const [defaultTitle, setDefaultTitle] = useState(title);
   const [newTitle, setNewTitle] = useState(title);
   const [debouncedTitle, setDebouncedTitle] = useState(newTitle);
-  const { updateSectionTitle } = useBoardsStore();
 
   const { toast } = useToast();
 
@@ -28,18 +35,36 @@ export default function SectionControls({ title, boardID, sectionID }: Props) {
 
   const updateTitle = async () => {
     if (newTitle.trim() != defaultTitle.trim() && title.trim() != "") {
-      setDefaultTitle(newTitle);
-      const res = await updateSectionTitle(boardID, sectionID, newTitle);
-      if (res.status === 200) {
+      try {
+        setDefaultTitle(newTitle);
+        const res = await axiosClient.patch(
+          "/section/" + sectionID,
+          { title: newTitle },
+          { withCredentials: true }
+        );
+
+        if (res.status === 200) {
+          const updatedTitle = sections.map((s) =>
+            s.id === sectionID ? { ...s, title: title } : s
+          );
+          setSections(updatedTitle);
+          toast({
+            title: "Section has been updated successfully",
+            variant: "success",
+          });
+        } else {
+          toast({
+            title: res.data || "An unknown error occurred.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        const errorMessage = handleAxiosErrorMessage(error);
         toast({
-          title: "Section has been updated successfully",
-          variant: "success",
+          title: errorMessage || "An unknown error occurred.",
+          variant: "destructive",
         });
-      } else {
-        toast({
-          title: res.data || "An unknown error occurred.",
-          variant: "success",
-        });
+        throw new Error(errorMessage);
       }
     }
   };

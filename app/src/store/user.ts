@@ -1,4 +1,4 @@
-import { axiosClient } from "@/lib/axios-client";
+import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 import axios, { AxiosResponse } from "axios";
 import { create } from "zustand";
 
@@ -199,13 +199,3 @@ export const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 }));
-
-export function handleAxiosErrorMessage(error: unknown) {
-  let errorMessage = "An unknown error occurred";
-  if (axios.isAxiosError(error) && error.response?.data?.message) {
-    errorMessage = error.response.data.message;
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
-  }
-  return errorMessage;
-}

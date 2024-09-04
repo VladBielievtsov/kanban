@@ -2,7 +2,7 @@
 
 import { axiosClient } from "@/lib/axios-client";
 import BoardInfo from "./BoardInfo";
-import Kanban from "./Kanban";
+import Kanban, { Sections } from "./Kanban";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Alert from "@/components/Alert";
@@ -18,6 +18,7 @@ export default function Board({ id }: Props) {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [icon, setIcon] = useState("");
+  const [sections, setSections] = useState<Sections[]>([]);
 
   const getBoard = async () => {
     try {
@@ -30,7 +31,7 @@ export default function Board({ id }: Props) {
         setDescription(res.data.description);
         setTitle(res.data.title);
         setIcon(res.data.icon);
-        console.log(res);
+        setSections(res.data.sections);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -59,7 +60,7 @@ export default function Board({ id }: Props) {
             setTitle={setTitle}
             setIcon={setIcon}
           />
-          <Kanban boardId={id} />
+          <Kanban boardId={id} sections={sections} setSections={setSections} />
         </>
       ) : (
         <div className="p-4 flex items-center justify-center">

@@ -1,21 +1,23 @@
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import SectionItem from "./SectionItem";
-import { Sections } from "@/store/boards";
+import { Sections } from "./Kanban";
 
 interface Props {
-  data: Sections[];
-  setData: React.Dispatch<React.SetStateAction<Sections[]>>;
+  sections: Sections[];
+  setSections: React.Dispatch<React.SetStateAction<Sections[]>>;
 }
 
-export default function SectionList({ data, setData }: Props) {
+export default function SectionList({ sections, setSections }: Props) {
   const onDragEnd = ({ source, destination }: DropResult) => {
     if (!destination) return;
-    const sourceColIndex = data.findIndex((e) => e.id === source.droppableId);
-    const destinationColIndex = data.findIndex(
+    const sourceColIndex = sections.findIndex(
+      (e) => e.id === source.droppableId
+    );
+    const destinationColIndex = sections.findIndex(
       (e) => e.id === destination.droppableId
     );
-    const sourceCol = data[sourceColIndex];
-    const destinationCol = data[destinationColIndex];
+    const sourceCol = sections[sourceColIndex];
+    const destinationCol = sections[destinationColIndex];
 
     const sourceSectionId = sourceCol.id;
     const destinationSectionId = destinationCol.id;
@@ -26,18 +28,18 @@ export default function SectionList({ data, setData }: Props) {
     if (source.droppableId !== destination.droppableId) {
       const [removed] = sourceTasks.splice(source.index, 1);
       destinationTasks.splice(destination.index, 0, removed);
-      data[sourceColIndex].tasks = sourceTasks;
-      data[destinationColIndex].tasks = destinationTasks;
+      sections[sourceColIndex].tasks = sourceTasks;
+      sections[destinationColIndex].tasks = destinationTasks;
     } else {
       const [removed] = destinationTasks.splice(source.index, 1);
       destinationTasks.splice(destination.index, 0, removed);
-      data[destinationColIndex].tasks = destinationTasks;
+      sections[destinationColIndex].tasks = destinationTasks;
     }
 
-    setData(data);
+    setSections(sections);
   };
 
-  const tasks = data.map((d) => ({ ...d, tasks: [] }));
+  const tasks = sections.map((s) => ({ ...s, tasks: [] }));
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -45,14 +47,14 @@ export default function SectionList({ data, setData }: Props) {
         className="flex items-start overflow-x-auto"
         style={{ width: "calc(100vw - 432px)" }}
       >
-        {data.map((section, key) => (
+        {sections.map((section, key) => (
           <SectionItem
             key={section.id}
             id={section.id}
             title={section.title}
             boardID={section.board_id}
-            data={data}
-            setData={setData}
+            sections={sections}
+            setSections={setSections}
             tasks={tasks[key].tasks}
           />
         ))}

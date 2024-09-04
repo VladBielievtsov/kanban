@@ -45,9 +45,7 @@ func (s *BoardServices) CreateBoard(userID *uuid.UUID) (types.Board, error) {
 func (s *BoardServices) GetAll(userID *uuid.UUID) ([]types.Board, error) {
 	boards := []types.Board{}
 
-	if err := s.db.Where("user_id = ?", userID).Preload("Sections", func(db *gorm.DB) *gorm.DB {
-		return db.Order("created_at ASC")
-	}).Find(&boards).Error; err != nil {
+	if err := s.db.Where("user_id = ?", userID).Find(&boards).Error; err != nil {
 		return boards, fmt.Errorf("failed to get a boards: %v", err)
 	}
 

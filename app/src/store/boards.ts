@@ -8,24 +8,8 @@ interface Boards {
   user_id: string;
   description: string;
   icon: string;
-  sections: Sections[];
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Sections {
-  id: string;
-  title: string;
-  user_id: string;
-  board_id: string;
-  tasks: ITask[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ITask {
-  id: string;
-  title: string;
 }
 
 type BoardsStore = {
@@ -40,13 +24,6 @@ type BoardsStore = {
     title: string,
     description: string,
     icon: string
-  ) => Promise<AxiosResponse<any>>;
-  createSection: (boardID: string) => Promise<AxiosResponse<any>>;
-  getAllSections: (boardID: string) => Promise<Sections[] | []>;
-  updateSectionTitle: (
-    boardID: string,
-    sectionID: string,
-    title: string
   ) => Promise<AxiosResponse<any>>;
 };
 
@@ -135,73 +112,6 @@ export const useBoardsStore = create<BoardsStore>((set, get) => ({
         set((state) => ({
           boards: state.boards?.map((board) =>
             board.id === id ? { ...board, title, description, icon } : board
-          ),
-        }));
-        return res;
-      } else {
-        return res;
-      }
-    } catch (error) {
-      const errorMessage = handleAxiosErrorMessage(error);
-      throw new Error(errorMessage);
-    }
-  },
-
-  async createSection(boardID) {
-    try {
-      const res = await axiosClient.post(
-        "/section/" + boardID,
-        {},
-        { withCredentials: true }
-      );
-
-      if (res.status === 200) {
-        set((state) => ({
-          boards: state.boards?.map((board) =>
-            board.id === boardID
-              ? {
-                  ...board,
-                  sections: [...board.sections, { ...res.data, tasks: [] }],
-                }
-              : board
-          ),
-        }));
-        return res;
-      } else {
-        return res;
-      }
-    } catch (error) {
-      const errorMessage = handleAxiosErrorMessage(error);
-      throw new Error(errorMessage);
-    }
-  },
-
-  async getAllSections(boardID) {
-    const arr = get().boards?.find((board) => board.id === boardID);
-    return arr?.sections || [];
-  },
-
-  async updateSectionTitle(boardID, sectionID, title) {
-    try {
-      const res = await axiosClient.patch(
-        "/section/" + sectionID,
-        { title },
-        { withCredentials: true }
-      );
-
-      if (res.status === 200) {
-        set((state) => ({
-          boards: state.boards?.map((board) =>
-            board.id === boardID
-              ? {
-                  ...board,
-                  sections: board.sections.map((section) =>
-                    section.id === sectionID
-                      ? { ...section, title: title }
-                      : section
-                  ),
-                }
-              : board
           ),
         }));
         return res;
