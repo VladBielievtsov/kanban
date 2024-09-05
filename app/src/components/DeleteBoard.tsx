@@ -19,6 +19,7 @@ import { useBoardsStore } from "@/store/boards";
 import ErrorText from "./ErrorText";
 import { LoadingSpinner } from "./icons/LoadingSpinner";
 import { useRouter } from "next/navigation";
+import { handleAxiosErrorMessage } from "@/lib/axios-client";
 
 interface Props {
   id: string;
@@ -34,19 +35,33 @@ export default function DeleteBoard({ id }: Props) {
   const { toast } = useToast();
 
   const onDelete = async () => {
-    setLoading(true);
-    const res = await deleteBoard(id);
-    if (res.status === 200) {
+    try {
+      setLoading(true);
+      const res = await deleteBoard(id);
+      if (res.status === 200) {
+        setLoading(false);
+        setOpen(false);
+        router.push("/");
+        toast({
+          title: "The board has been deleted",
+          variant: "success",
+        });
+      } else {
+        setLoading(false);
+        toast({
+          title: res.data,
+          variant: "destructive",
+        });
+        setError(res.data || "An unknown error occurred.");
+      }
+    } catch (error) {
       setLoading(false);
-      setOpen(false);
-      router.push("/");
+      const errorMessage = handleAxiosErrorMessage(error);
       toast({
-        title: res.data,
-        variant: "success",
+        title: errorMessage || "An unknown error occurred.",
+        variant: "destructive",
       });
-    } else {
-      setLoading(false);
-      setError(res.data || "An unknown error occurred.");
+      throw new Error(errorMessage);
     }
   };
 

@@ -79,9 +79,9 @@ func DeleteBoard(boardServices *services.BoardServices) http.HandlerFunc {
 			return
 		}
 
-		result, err := boardServices.Delete(&id, boardID)
+		result, status, err := boardServices.Delete(&id, boardID)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 

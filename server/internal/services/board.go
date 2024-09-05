@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
@@ -52,18 +53,52 @@ func (s *BoardServices) GetAll(userID *uuid.UUID) ([]types.Board, error) {
 	return boards, nil
 }
 
-func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, error) {
-	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).Delete(&types.Board{})
-
-	if result.Error != nil {
-		return "", fmt.Errorf("failed to delete the board: %v", result.Error)
+func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, int, error) {
+	tx := s.db.Begin()
+	if tx.Error != nil {
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to start transaction: %v", tx.Error)
 	}
 
-	if result.RowsAffected == 0 {
-		return "", fmt.Errorf("no board found with the specified ID for this user")
+	var board types.Board
+	err := tx.Preload("Sections.Tasks").Where("id = ? AND user_id = ?", boardID, userID).First(&board).Error
+	if err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", http.StatusNotFound, fmt.Errorf("board not found")
+		}
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to find the board: %v", err)
 	}
 
-	return "The board has been successfully delete", nil
+	for _, section := range board.Sections {
+		taskResult := tx.Where("section_id = ?", section.ID).Delete(&types.Task{})
+		if taskResult.Error != nil {
+			tx.Rollback()
+			return "", http.StatusInternalServerError, fmt.Errorf("failed to delete tasks for section %v: %v", section.ID, taskResult.Error)
+		}
+	}
+
+	sectionResult := tx.Where("board_id = ?", boardID).Delete(&types.Section{})
+	if sectionResult.Error != nil {
+		tx.Rollback()
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete sections for the board: %v", sectionResult.Error)
+	}
+
+	boardResult := tx.Where("id = ? AND user_id = ?", boardID, userID).Delete(&types.Board{})
+	if boardResult.Error != nil {
+		tx.Rollback()
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete the board: %v", boardResult.Error)
+	}
+
+	if boardResult.RowsAffected == 0 {
+		tx.Rollback()
+		return "", http.StatusNotFound, fmt.Errorf("no board found with the specified ID for this user")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to commit transaction: %v", err)
+	}
+
+	return boardID, http.StatusOK, nil
 }
 
 func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (types.Board, int, error) {
