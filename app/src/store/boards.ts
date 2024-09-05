@@ -2,7 +2,7 @@ import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 import { AxiosResponse } from "axios";
 import { create } from "zustand";
 
-interface Boards {
+export interface Board {
   id: string;
   title: string;
   user_id: string;
@@ -16,7 +16,7 @@ interface Boards {
 type BoardsStore = {
   loading: boolean;
   error: string | null;
-  boards: Boards[] | null;
+  boards: Board[] | null;
   createBoard: () => Promise<AxiosResponse<any> | string>;
   allBoards: () => Promise<AxiosResponse<any>>;
   deleteBoard: (id: string) => Promise<AxiosResponse<any>>;

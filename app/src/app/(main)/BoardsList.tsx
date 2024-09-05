@@ -1,37 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { useBoardsStore } from "@/store/boards";
+import { Board, useBoardsStore } from "@/store/boards";
 import { Skeleton } from "@/components/ui";
 import ErrorText from "@/components/ErrorText";
 
 interface Props {
   variant: "all" | "favorites";
+  loading: boolean;
+  error: string | null;
 }
 
-export default function BoardsList({ variant }: Props) {
-  const { boards, allBoards } = useBoardsStore();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export default function BoardsList({ variant, loading, error }: Props) {
+  const { boards } = useBoardsStore();
 
-  const getAllBoards = async () => {
-    setLoading(true);
-    const res = await allBoards();
-    if (res.status === 200) {
-      setLoading(false);
-    } else {
-      setError(res.data || "An unknown error occurred.");
-    }
-  };
+  let displayBoards: Board[] = [];
 
-  useEffect(() => {
-    if (!boards) {
-      getAllBoards();
-    } else {
-      setLoading(false);
-    }
-  }, [boards, allBoards]);
+  if (variant === "favorites") {
+    displayBoards = boards?.filter((b) => b.favorite) || [];
+  } else if (variant === "all") {
+    displayBoards = boards || [];
+  }
+
+  if (variant === "favorites" && displayBoards?.length === 0) {
+    return null;
+  }
 
   return (
     <div>
@@ -46,8 +39,8 @@ export default function BoardsList({ variant }: Props) {
           </div>
         ) : error ? (
           <ErrorText error={error} />
-        ) : boards && boards.length > 0 ? (
-          boards.map((b) => (
+        ) : displayBoards && displayBoards.length > 0 ? (
+          displayBoards.map((b) => (
             <Link
               key={b.id}
               href={"/boards/" + b.id}
