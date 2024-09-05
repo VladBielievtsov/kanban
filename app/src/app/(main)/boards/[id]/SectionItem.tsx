@@ -46,25 +46,26 @@ export default function SectionItem({
                 setSections={setSections}
               />
             </div>
-            {tasks.map((task, idx) => (
-              <Draggable key={task.id} draggableId={task.id} index={idx}>
-                {(provided, snapshot) => (
-                  <Link
-                    href={"/task/" + task.id}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    className={cn(
-                      snapshot.isDragging ? "cursor-grab" : "cursor-pointer",
-                      "flex items-center justify-between px-3 py-2 mb-2 font-bold text-sm rounded-md bg-input border border-input"
-                    )}
-                  >
-                    <span>{task.title === "" ? "Untitled" : task.title}</span>
-                    <SquareArrowOutUpRight size={18} />
-                  </Link>
-                )}
-              </Draggable>
-            ))}
+            {tasks &&
+              tasks.map((task, idx) => (
+                <Draggable key={task.id} draggableId={task.id} index={idx}>
+                  {(provided, snapshot) => (
+                    <Link
+                      href={"/task/" + task.id}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className={cn(
+                        snapshot.isDragging ? "cursor-grab" : "cursor-pointer",
+                        "flex items-center justify-between px-3 py-2 mb-2 font-bold text-sm rounded-md bg-input border border-input"
+                      )}
+                    >
+                      <span>{task.title === "" ? "Untitled" : task.title}</span>
+                      <SquareArrowOutUpRight size={18} />
+                    </Link>
+                  )}
+                </Draggable>
+              ))}
             {provided.placeholder}
           </div>
         )}

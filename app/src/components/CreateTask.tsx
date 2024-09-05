@@ -36,7 +36,7 @@ export default function CreateTask({
             ? {
                 ...section,
                 tasks: [
-                  ...section.tasks,
+                  ...(section.tasks || []),
                   { id: res.data.id, title: res.data.title },
                 ],
               }
