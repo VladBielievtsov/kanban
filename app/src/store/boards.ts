@@ -8,6 +8,7 @@ interface Boards {
   user_id: string;
   description: string;
   icon: string;
+  favorite: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,6 +26,7 @@ type BoardsStore = {
     description: string,
     icon: string
   ) => Promise<AxiosResponse<any>>;
+  toggleFav: (id: string) => Promise<AxiosResponse<any>>;
 };
 
 export const useBoardsStore = create<BoardsStore>((set, get) => ({
@@ -112,6 +114,30 @@ export const useBoardsStore = create<BoardsStore>((set, get) => ({
         set((state) => ({
           boards: state.boards?.map((board) =>
             board.id === id ? { ...board, title, description, icon } : board
+          ),
+        }));
+        return res;
+      } else {
+        return res;
+      }
+    } catch (error) {
+      const errorMessage = handleAxiosErrorMessage(error);
+      throw new Error(errorMessage);
+    }
+  },
+
+  async toggleFav(id) {
+    try {
+      const res = await axiosClient.patch(
+        `/board/${id}/favorite`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        set((state) => ({
+          boards: state.boards?.map((board) =>
+            board.id === id ? { ...board, favorite: res.data.favorite } : board
           ),
         }));
         return res;

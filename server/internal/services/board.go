@@ -124,13 +124,11 @@ func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (types.Board,
 func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req types.UpdateBoardBody) (types.Board, error) {
 	board := types.Board{}
 
-	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board)
-	if result.Error != nil {
-		return board, fmt.Errorf("failed to find the board: %v", result.Error)
-	}
-
-	if result.RowsAffected == 0 {
-		return board, fmt.Errorf("no board found with the specified ID for this user")
+	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return board, fmt.Errorf("no board found with the specified ID for this user")
+		}
+		return board, fmt.Errorf("failed to find the board: %v", err)
 	}
 
 	if strings.TrimSpace(req.Title) != "" {
@@ -148,4 +146,23 @@ func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req types.Upda
 	}
 
 	return board, nil
+}
+
+func (s *BoardServices) ToggleFavorite(userID *uuid.UUID, boardID string) (types.Board, int, error) {
+	board := types.Board{}
+
+	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return board, http.StatusNotFound, fmt.Errorf("no board found with the specified ID for this user")
+		}
+		return board, http.StatusInternalServerError, fmt.Errorf("failed to find the board: %v", err)
+	}
+
+	board.Favorite = !board.Favorite
+
+	if err := s.db.Save(&board).Error; err != nil {
+		return board, http.StatusInternalServerError, fmt.Errorf("failed to update the board: %v", err)
+	}
+
+	return board, http.StatusOK, nil
 }

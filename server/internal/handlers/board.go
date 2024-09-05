@@ -153,3 +153,32 @@ func UpdateBoard(boardServices *services.BoardServices) http.HandlerFunc {
 		utils.JSONResponse(w, http.StatusOK, board)
 	}
 }
+
+func ToggleFavoriteBoard(boardServices *services.BoardServices) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value(middlewares.UserContextKey).(string)
+		if !ok {
+			utils.JSONResponse(w, http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
+		}
+
+		id, err := uuid.Parse(userID)
+		if err != nil {
+			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": "Invalid UUID: " + err.Error()})
+			return
+		}
+
+		boardID := chi.URLParam(r, "id")
+		if boardID == "" {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Board id is required"})
+			return
+		}
+
+		board, status, err := boardServices.ToggleFavorite(&id, boardID)
+		if err != nil {
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
+			return
+		}
+
+		utils.JSONResponse(w, http.StatusOK, board)
+	}
+}

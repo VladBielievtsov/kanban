@@ -18,6 +18,7 @@ export default function Board({ id }: Props) {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [icon, setIcon] = useState("");
+  const [isFav, setIsFav] = useState<boolean>(false);
   const [sections, setSections] = useState<Sections[]>([]);
 
   const getBoard = async () => {
@@ -31,6 +32,7 @@ export default function Board({ id }: Props) {
         setDescription(res.data.description);
         setTitle(res.data.title);
         setIcon(res.data.icon);
+        setIsFav(res.data.favorite);
         const newArr: Sections[] = res.data.sections.map(
           (section: Sections) => ({
             ...section,
@@ -74,6 +76,8 @@ export default function Board({ id }: Props) {
             description={description}
             title={title}
             icon={icon}
+            isFav={isFav}
+            setIsFav={setIsFav}
             setDescription={setDescription}
             setTitle={setTitle}
             setIcon={setIcon}

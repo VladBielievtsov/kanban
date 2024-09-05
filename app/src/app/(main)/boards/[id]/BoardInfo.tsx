@@ -1,6 +1,6 @@
 "use client";
 
-import { CornerUpLeft, Star } from "lucide-react";
+import { CornerUpLeft } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import EmojiPicker from "./EmojiPicker";
 import Link from "next/link";
@@ -9,12 +9,16 @@ import DeleteBoard from "@/components/DeleteBoard";
 import { useDebounce } from "react-use";
 import { useBoardsStore } from "@/store/boards";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
+import { handleAxiosErrorMessage } from "@/lib/axios-client";
+import ToggleBoardFavorite from "@/components/ToggleBoardFavorite";
 
 interface Props {
   boardId: string;
   description: string;
   title: string;
   icon: string;
+  isFav: boolean;
+  setIsFav: Dispatch<SetStateAction<boolean>>;
   setDescription: Dispatch<SetStateAction<string>>;
   setTitle: Dispatch<SetStateAction<string>>;
   setIcon: Dispatch<SetStateAction<string>>;
@@ -25,11 +29,12 @@ export default function BoardInfo({
   description,
   title,
   icon,
+  isFav,
+  setIsFav,
   setDescription,
   setTitle,
   setIcon,
 }: Props) {
-  const [isFavorites, setIsFavorites] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [debouncedTitle, setDebouncedTitle] = useState(title);
   const [debouncedDescription, setDebouncedDescription] = useState(description);
@@ -42,10 +47,6 @@ export default function BoardInfo({
   const [loading, setLoading] = useState<boolean>(false);
 
   const { toast } = useToast();
-
-  const toggleFav = () => {
-    setIsFavorites(!isFavorites);
-  };
 
   const onIconChange = (newIcon: string) => {
     setIcon(newIcon);
@@ -85,21 +86,31 @@ export default function BoardInfo({
         description.trim() != "") ||
       (ic.trim() != defaultValues.icon.trim() && ic.trim() != "")
     ) {
-      setDefaultValues({ title, description, icon: ic });
-      setLoading(true);
-      const res = await updateBoard(boardId, title, description, ic);
-      if (res.status === 200) {
+      try {
+        setDefaultValues({ title, description, icon: ic });
+        setLoading(true);
+        const res = await updateBoard(boardId, title, description, ic);
+        if (res.status === 200) {
+          setLoading(false);
+          toast({
+            title: "Board has been updated successfully",
+            variant: "success",
+          });
+        } else {
+          setLoading(false);
+          toast({
+            title: res.data || "An unknown error occurred.",
+            variant: "success",
+          });
+        }
+      } catch (error) {
         setLoading(false);
+        const errorMessage = handleAxiosErrorMessage(error);
         toast({
-          title: "Board has been updated successfully",
-          variant: "success",
+          title: errorMessage || "An unknown error occurred.",
+          variant: "destructive",
         });
-      } else {
-        setLoading(false);
-        toast({
-          title: res.data || "An unknown error occurred.",
-          variant: "success",
-        });
+        throw new Error(errorMessage);
       }
     }
   };
@@ -119,13 +130,11 @@ export default function BoardInfo({
                 <CornerUpLeft />
               </Link>
             </Button>
-            <Button variant={"ghost"} onClick={toggleFav}>
-              {isFavorites ? (
-                <Star fill="#FBBF24" stroke="#FBBF24" />
-              ) : (
-                <Star />
-              )}
-            </Button>
+            <ToggleBoardFavorite
+              isFav={isFav}
+              setIsFav={setIsFav}
+              boardId={boardId}
+            />
           </div>
 
           <DeleteBoard id={boardId} />

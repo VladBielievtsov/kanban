@@ -89,6 +89,7 @@ func main() {
 		r.Delete("/board/{id}", handlers.DeleteBoard(boardServices))
 		r.Get("/board/{id}", handlers.GetBoardByID(boardServices))
 		r.Patch("/board/{id}", handlers.UpdateBoard(boardServices))
+		r.Patch("/board/{id}/favorite", handlers.ToggleFavoriteBoard(boardServices))
 	})
 
 	// SECTION
