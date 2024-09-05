@@ -10,8 +10,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
   Button,
+  useToast,
 } from "./ui";
 import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { LoadingSpinner } from "./icons/LoadingSpinner";
+import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 
 interface Props {
   id: string;
@@ -26,15 +30,57 @@ export default function DeleteSection({
   sections,
   setSections,
 }: Props) {
-  const removeSection = (id: string) => {
-    const newData = [...sections].filter((s) => s.id !== id);
-    setSections(newData);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const { toast } = useToast();
+
+  const removeSection = async (id: string) => {
+    try {
+      setLoading(true);
+      const res = await axiosClient.delete("/section/" + id, {
+        withCredentials: true,
+      });
+
+      if (res.status === 200) {
+        setLoading(false);
+        const newData = [...sections].filter((s) => s.id !== id);
+        setSections(newData);
+        toast({
+          title: "Section has been deleted successfully",
+          variant: "success",
+        });
+      } else {
+        setLoading(false);
+        toast({
+          title: res.data || "An unknown error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      const errorMessage = handleAxiosErrorMessage(error);
+      toast({
+        title: errorMessage || "An unknown error occurred.",
+        variant: "destructive",
+      });
+      throw new Error(errorMessage);
+    }
+  };
+
+  const onOpen = () => {
+    setLoading(false);
+    setOpen(true);
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} defaultOpen={open}>
       <AlertDialogTrigger asChild>
-        <Button variant={"outline"} className="bg-transparent rounded-l-none">
+        <Button
+          variant={"outline"}
+          onClick={onOpen}
+          className="bg-transparent rounded-l-none"
+        >
           <Trash2 size={18} />
         </Button>
       </AlertDialogTrigger>
@@ -46,9 +92,15 @@ export default function DeleteSection({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => removeSection(id)}>
-            Continue
+          <AlertDialogCancel onClick={() => setOpen(false)}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => removeSection(id)}
+            className="min-w-[92px]"
+            disabled={loading}
+          >
+            {loading ? <LoadingSpinner /> : "Continue"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

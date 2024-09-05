@@ -70,6 +70,7 @@ export default function CreateTask({
       variant={"outline"}
       className="bg-transparent rounded-none"
       onClick={() => addTask()}
+      disabled={loading}
     >
       {loading ? <LoadingSpinner size={18} /> : <Plus size={18} />}
     </Button>

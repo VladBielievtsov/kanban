@@ -78,3 +78,32 @@ func UpdateSectionTitle(sectionServices *services.SectionServices) http.HandlerF
 		utils.JSONResponse(w, http.StatusOK, section)
 	}
 }
+
+func DeleteSection(sectionServices *services.SectionServices) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value(middlewares.UserContextKey).(string)
+		if !ok {
+			utils.JSONResponse(w, http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
+		}
+
+		id, err := uuid.Parse(userID)
+		if err != nil {
+			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": "Invalid UUID: " + err.Error()})
+			return
+		}
+
+		sectionID := chi.URLParam(r, "section-id")
+		if sectionID == "" {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Section id is required"})
+			return
+		}
+
+		result, status, err := sectionServices.Delete(&id, sectionID)
+		if err != nil {
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
+			return
+		}
+
+		utils.JSONResponse(w, status, result)
+	}
+}

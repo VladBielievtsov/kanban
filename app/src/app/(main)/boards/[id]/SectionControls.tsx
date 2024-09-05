@@ -1,10 +1,10 @@
-import { Button, Input, useToast } from "@/components/ui";
+import { Input, useToast } from "@/components/ui";
 import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 import { useState } from "react";
 import { useDebounce } from "react-use";
 import { Sections } from "./Kanban";
-import { Plus } from "lucide-react";
 import CreateTask from "@/components/CreateTask";
+import DeleteSection from "@/components/DeleteSection";
 
 interface Props {
   title: string;
@@ -79,6 +79,12 @@ export default function SectionControls({
       />
       <CreateTask
         sectionID={sectionID}
+        sections={sections}
+        setSections={setSections}
+      />
+      <DeleteSection
+        id={sectionID}
+        title={title}
         sections={sections}
         setSections={setSections}
       />

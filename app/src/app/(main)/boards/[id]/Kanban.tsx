@@ -69,7 +69,11 @@ export default function Kanban({ boardId, sections, setSections }: Props) {
   return (
     <div className="px-10">
       <div className="flex items-center justify-between">
-        <Button onClick={addSection} className="min-w-[111px]">
+        <Button
+          onClick={addSection}
+          className="min-w-[111px]"
+          disabled={loading}
+        >
           {loading ? <LoadingSpinner /> : "Add section"}
         </Button>
         <div className="text-sm font-bold">{sections.length} Sections</div>

@@ -68,3 +68,33 @@ func (s *SectionServices) UpdateTitle(userID *uuid.UUID, sectionID string, req t
 
 	return section, http.StatusOK, nil
 }
+
+func (s *SectionServices) Delete(userID *uuid.UUID, sectionID string) (string, int, error) {
+	tx := s.db.Begin()
+	if tx.Error != nil {
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to start transaction: %v", tx.Error)
+	}
+
+	taskResult := tx.Where("section_id = ? AND user_id = ?", sectionID, userID).Delete(&types.Task{})
+	if taskResult.Error != nil {
+		tx.Rollback()
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete tasks associated with the section: %v", taskResult.Error)
+	}
+
+	sectionResult := tx.Where("id = ? AND user_id = ?", sectionID, userID).Delete(&types.Section{})
+	if sectionResult.Error != nil {
+		tx.Rollback()
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete the section: %v", sectionResult.Error)
+	}
+
+	if sectionResult.RowsAffected == 0 {
+		tx.Rollback()
+		return "", http.StatusNotFound, fmt.Errorf("no section found with the specified ID for this user")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to commit transaction: %v", err)
+	}
+
+	return sectionID, http.StatusOK, nil
+}

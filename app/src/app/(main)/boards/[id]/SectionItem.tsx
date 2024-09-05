@@ -39,12 +39,6 @@ export default function SectionItem({
                 sections={sections}
                 setSections={setSections}
               />
-              <DeleteSection
-                id={id}
-                title={title}
-                sections={sections}
-                setSections={setSections}
-              />
             </div>
             {tasks &&
               tasks.map((task, idx) => (
