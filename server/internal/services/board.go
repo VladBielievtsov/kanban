@@ -46,7 +46,7 @@ func (s *BoardServices) CreateBoard(userID *uuid.UUID) (types.Board, error) {
 func (s *BoardServices) GetAll(userID *uuid.UUID) ([]types.Board, error) {
 	boards := []types.Board{}
 
-	if err := s.db.Where("user_id = ?", userID).Find(&boards).Error; err != nil {
+	if err := s.db.Where("user_id = ?", userID).Order("updated_at DESC").Find(&boards).Error; err != nil {
 		return boards, fmt.Errorf("failed to get a boards: %v", err)
 	}
 

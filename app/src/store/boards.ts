@@ -45,7 +45,7 @@ export const useBoardsStore = create<BoardsStore>((set, get) => ({
 
       if (res.status === 200) {
         set((state) => ({
-          boards: [...(state.boards || []), res.data],
+          boards: [res.data, ...(state.boards || [])],
           loading: false,
         }));
         return res;
@@ -111,11 +111,28 @@ export const useBoardsStore = create<BoardsStore>((set, get) => ({
       );
 
       if (res.status === 200) {
-        set((state) => ({
-          boards: state.boards?.map((board) =>
-            board.id === id ? { ...board, title, description, icon } : board
-          ),
-        }));
+        set((state) => {
+          const updatedBoards = state.boards?.map((board) =>
+            board.id === id
+              ? {
+                  ...board,
+                  title,
+                  description,
+                  icon,
+                  updatedAt: res.data.updatedAt,
+                }
+              : board
+          );
+
+          updatedBoards?.sort(
+            (a, b) =>
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+
+          return {
+            boards: updatedBoards,
+          };
+        });
         return res;
       } else {
         return res;
@@ -135,11 +152,26 @@ export const useBoardsStore = create<BoardsStore>((set, get) => ({
       );
 
       if (res.status === 200) {
-        set((state) => ({
-          boards: state.boards?.map((board) =>
-            board.id === id ? { ...board, favorite: res.data.favorite } : board
-          ),
-        }));
+        set((state) => {
+          const updatedBoards = state.boards?.map((board) =>
+            board.id === id
+              ? {
+                  ...board,
+                  favorite: res.data.favorite,
+                  updatedAt: res.data.updatedAt,
+                }
+              : board
+          );
+
+          updatedBoards?.sort(
+            (a, b) =>
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+
+          return {
+            boards: updatedBoards,
+          };
+        });
         return res;
       } else {
         return res;
