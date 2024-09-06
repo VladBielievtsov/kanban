@@ -87,3 +87,12 @@ func (s *TaskServices) Update(userID *uuid.UUID, taskID string, req types.Update
 
 	return task, http.StatusOK, nil
 }
+
+func (s *TaskServices) Delete(userID *uuid.UUID, taskID string) (string, int, error) {
+	result := s.db.Where("id = ? AND user_id = ?", taskID, userID).Delete(&types.Task{})
+	if result.Error != nil {
+		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete task: %v", result.Error)
+	}
+
+	return taskID, http.StatusOK, nil
+}

@@ -4,8 +4,6 @@ import { Button, Separator } from "@/components/ui";
 import { CornerUpLeft } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import "./style.css";
 import DeleteTask from "@/components/DeleteTask";
 import TaskInfo from "./TaskInfo";
@@ -15,6 +13,7 @@ import Alert from "@/components/Alert";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { ITask } from "../../boards/[id]/Kanban";
 import Loading from "@/components/Loading";
+import TaskContent from "./TaskContent";
 
 interface Props {
   id: string;
@@ -81,7 +80,7 @@ export default function Task({ id }: Props) {
                 <CornerUpLeft />
               </Link>
             </Button>
-            <DeleteTask />
+            <DeleteTask title={task?.title!} id={id} />
           </div>
           <div className="px-10 pt-4">
             <TaskInfo
@@ -93,9 +92,7 @@ export default function Task({ id }: Props) {
             <div className="py-10">
               <Separator />
             </div>
-            <div className="prose lg:prose-xl max-w-full">
-              {/* <CKEditor editor={ClassicEditor} data={"Hello"}></CKEditor> */}
-            </div>
+            <TaskContent />
           </div>
         </>
       ) : (

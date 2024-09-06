@@ -108,6 +108,7 @@ func main() {
 		r.Post("/task/{section-id}", handlers.CreateTask(taskServices))
 		r.Get("/task/{id}", handlers.GetTaskByID(taskServices))
 		r.Patch("/task/{id}", handlers.UpdateTask(taskServices))
+		r.Delete("/task/{id}", handlers.DeleteTask(taskServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)
