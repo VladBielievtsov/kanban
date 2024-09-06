@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
@@ -47,6 +48,19 @@ func (s *TaskServices) Create(userID uuid.UUID, sectionID string) (types.Task, i
 
 	if err := s.db.Create(&task).Error; err != nil {
 		return task, http.StatusInternalServerError, fmt.Errorf("failed to create a task: %v", err)
+	}
+
+	return task, http.StatusOK, nil
+}
+
+func (s *TaskServices) GetByID(taskID string) (types.Task, int, error) {
+	task := types.Task{}
+
+	if err := s.db.Where("id = ?", taskID).First(&task).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return task, http.StatusNotFound, fmt.Errorf("no task found with the specified ID")
+		}
+		return task, http.StatusNotFound, fmt.Errorf("failed to find the board: %v", err)
 	}
 
 	return task, http.StatusOK, nil

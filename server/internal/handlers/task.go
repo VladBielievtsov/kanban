@@ -39,3 +39,21 @@ func CreateTask(taskServices *services.TaskServices) http.HandlerFunc {
 		utils.JSONResponse(w, http.StatusOK, task)
 	}
 }
+
+func GetTaskByID(taskServices *services.TaskServices) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		taskID := chi.URLParam(r, "id")
+		if taskID == "" {
+			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Task id is required"})
+			return
+		}
+
+		task, status, err := taskServices.GetByID(taskID)
+		if err != nil {
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
+			return
+		}
+
+		utils.JSONResponse(w, http.StatusOK, task)
+	}
+}

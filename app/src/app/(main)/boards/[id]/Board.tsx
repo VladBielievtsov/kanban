@@ -50,10 +50,14 @@ export default function Board({ id }: Props) {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        if (error.request.status === 404) {
+        if (error.response?.status === 404) {
           setError("failed to find the board: record not found");
-          setLoading(false);
+        } else if (error.response?.status === 500) {
+          setError("Internal Server Error occurred");
+        } else {
+          setError("An unexpected error occurred");
         }
+        setLoading(false);
       }
     }
   };
