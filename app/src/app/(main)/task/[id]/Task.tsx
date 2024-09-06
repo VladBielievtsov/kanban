@@ -14,6 +14,7 @@ import { axiosClient } from "@/lib/axios-client";
 import Alert from "@/components/Alert";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { ITask } from "../../boards/[id]/Kanban";
+import Loading from "@/components/Loading";
 
 interface Props {
   id: string;
@@ -29,6 +30,7 @@ export default function Task({ id }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [task, setTask] = useState<TaskFull | null>(null);
+  const [loadingTitle, setLoadingTitle] = useState<boolean>(false);
 
   const getTask = async () => {
     try {
@@ -68,7 +70,8 @@ export default function Task({ id }: Props) {
   }, []);
 
   return (
-    <div>
+    <div className="relative">
+      <Loading loading={loadingTitle} />
       {error && <Alert variant="danger">{error}</Alert>}
       {!loading && !error ? (
         <>
@@ -81,7 +84,12 @@ export default function Task({ id }: Props) {
             <DeleteTask />
           </div>
           <div className="px-10 pt-4">
-            <TaskInfo task={task} />
+            <TaskInfo
+              task={task!}
+              setTask={setTask}
+              taskId={id}
+              setLoading={setLoadingTitle}
+            />
             <div className="py-10">
               <Separator />
             </div>

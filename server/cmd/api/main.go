@@ -107,6 +107,7 @@ func main() {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Post("/task/{section-id}", handlers.CreateTask(taskServices))
 		r.Get("/task/{id}", handlers.GetTaskByID(taskServices))
+		r.Patch("/task/{id}", handlers.UpdateTask(taskServices))
 	})
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)

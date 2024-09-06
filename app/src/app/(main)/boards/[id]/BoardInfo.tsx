@@ -11,6 +11,7 @@ import { useBoardsStore } from "@/store/boards";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { handleAxiosErrorMessage } from "@/lib/axios-client";
 import ToggleBoardFavorite from "@/components/ToggleBoardFavorite";
+import Loading from "@/components/Loading";
 
 interface Props {
   boardId: string;
@@ -117,11 +118,7 @@ export default function BoardInfo({
 
   return (
     <>
-      {loading && (
-        <div className="absolute left-0 right-0 top-4 p-4 flex items-center justify-center">
-          <LoadingSpinner size={32} />
-        </div>
-      )}
+      <Loading loading={loading} />
       <div>
         <div className="mt-3 flex items-center justify-between">
           <div>

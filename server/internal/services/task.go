@@ -6,6 +6,7 @@ import (
 	"kanban-api/internal/config"
 	"kanban-api/internal/types"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -60,7 +61,28 @@ func (s *TaskServices) GetByID(taskID string) (types.Task, int, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return task, http.StatusNotFound, fmt.Errorf("no task found with the specified ID")
 		}
-		return task, http.StatusNotFound, fmt.Errorf("failed to find the board: %v", err)
+		return task, http.StatusNotFound, fmt.Errorf("failed to find the task: %v", err)
+	}
+
+	return task, http.StatusOK, nil
+}
+
+func (s *TaskServices) Update(userID *uuid.UUID, taskID string, req types.UpdateTaskBody) (types.Task, int, error) {
+	task := types.Task{}
+
+	if err := s.db.Where("user_id = ? AND id = ?", userID, taskID).First(&task).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return task, http.StatusNotFound, fmt.Errorf("no task found with the specified ID")
+		}
+		return task, http.StatusNotFound, fmt.Errorf("failed to find the task: %v", err)
+	}
+
+	if strings.TrimSpace(req.Title) != "" {
+		task.Title = req.Title
+	}
+
+	if err := s.db.Save(&task).Error; err != nil {
+		return task, http.StatusInternalServerError, fmt.Errorf("failed to update the task: %v", err)
 	}
 
 	return task, http.StatusOK, nil

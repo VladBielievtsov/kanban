@@ -14,8 +14,8 @@ type User struct {
 	FirstName   string     `gorm:"type:varchar(255);not null" json:"first_name"`
 	LastName    string     `gorm:"type:varchar(255);not null" json:"last_name"`
 	Email       string     `gorm:"type:varchar(255);unique;not null" json:"email"`
-	CreatedAt   *time.Time `gorm:"not null;default:now()" json:"createdAt"`
-	UpdatedAt   *time.Time `gorm:"not null;default:now()" json:"updatedAt"`
+	CreatedAt   *time.Time `gorm:"not null;autoCreateTime" json:"createdAt"`
+	UpdatedAt   *time.Time `gorm:"not null;autoUpdateTime" json:"updatedAt"`
 
 	Boards []Board `gorm:"foreignKey:UserID" json:"boards"`
 }
@@ -154,4 +154,8 @@ type Task struct {
 	Position  int       `gorm:"type:int;not null" json:"position"`
 	CreatedAt time.Time `gorm:"not null;autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"not null;autoUpdateTime" json:"updatedAt"`
+}
+
+type UpdateTaskBody struct {
+	Title string `json:"title"`
 }
