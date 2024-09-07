@@ -1,28 +1,79 @@
-import { Textarea } from "@/components/ui";
-import { useEffect, useRef, useState } from "react";
+import {
+  Button,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  Textarea,
+} from "@/components/ui";
+
+import { cn } from "@/lib/utils";
+import { Columns2, Fullscreen } from "lucide-react";
+import { useState } from "react";
+import Markdown from "react-markdown";
+import Editor from "./Editor";
 
 export default function TaskContent() {
   const [content, setContent] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, [content]);
+  const [isPreview, setIsPreview] = useState<boolean>(false);
+  const [isSplit, setIsSplit] = useState<boolean>(false);
+
+  const onPreview = () => {
+    setIsSplit(false);
+    setIsPreview(!isPreview);
+  };
+
+  const onSplit = () => {
+    setIsPreview(false);
+    setIsSplit(!isSplit);
+  };
 
   return (
-    <div className="prose lg:prose-xl max-w-full">
-      <Textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        rows={1}
-        placeholder="# Hello"
-        className="overflow-hidden resize-none text-lg focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-      />
+    <div
+      className={cn(
+        !isSplit ? "max-w-6xl mx-auto" : "max-w-full",
+        "prose lg:prose-xl"
+      )}
+    >
+      <div className="border-input border rounded-md relative">
+        <div className="absolute top-2 right-2">
+          <Button variant={"ghost"} onClick={onPreview}>
+            <Fullscreen size={20} />
+          </Button>
+          <Button variant={"ghost"} onClick={onSplit}>
+            <Columns2 size={20} />
+          </Button>
+        </div>
+        {!isPreview && !isSplit && (
+          <Editor
+            content={content}
+            setContent={setContent}
+            values={[isPreview, isSplit]}
+          />
+        )}
+
+        {isPreview && !isSplit && <Preview content={content} />}
+
+        {isSplit && (
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel minSize={20}>
+              <Editor
+                content={content}
+                setContent={setContent}
+                values={[isPreview, isSplit]}
+              />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel minSize={20}>
+              <Preview content={content} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
+      </div>
     </div>
   );
+}
+
+function Preview({ content }: { content: string }) {
+  return <Markdown className="p-2 min-h-20">{content}</Markdown>;
 }

@@ -46,3 +46,8 @@ export { useToast } from "./use-toast";
 export { Toaster } from "./toaster";
 export { Label } from "./label";
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+export {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "./resizable";
