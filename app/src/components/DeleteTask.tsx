@@ -65,8 +65,12 @@ export default function DeleteTask({ id, title }: Props) {
   return (
     <AlertDialog open={open} defaultOpen={open}>
       <AlertDialogTrigger asChild>
-        <Button variant={"ghost"} onClick={onOpen}>
-          <Trash2 />
+        <Button
+          variant={"ghost"}
+          onClick={onOpen}
+          className="w-full justify-between py-1.5 px-2 text-sm h-auto font-normal"
+        >
+          <span>Delete</span> <Trash2 size={16} />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

@@ -40,7 +40,6 @@ export default function TaskInfo({ taskId, task, setTask, setLoading }: Props) {
     if (newTitle.trim() != defaultTitle.trim() && task.title.trim() != "") {
       try {
         setLoading(true);
-        setDefaultTitle(newTitle);
         const res = await axiosClient.patch(
           "/task/" + taskId,
           { title: newTitle },
@@ -48,6 +47,7 @@ export default function TaskInfo({ taskId, task, setTask, setLoading }: Props) {
         );
 
         if (res.status === 200) {
+          setDefaultTitle(newTitle);
           setLoading(false);
           setTask({
             ...task,

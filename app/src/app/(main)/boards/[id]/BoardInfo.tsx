@@ -118,7 +118,7 @@ export default function BoardInfo({
 
   return (
     <>
-      <Loading loading={loading} />
+      <Loading loading={[loading]} />
       <div>
         <div className="mt-3 flex items-center justify-between">
           <div>

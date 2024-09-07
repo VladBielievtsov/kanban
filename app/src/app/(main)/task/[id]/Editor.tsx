@@ -1,14 +1,29 @@
-import { Textarea } from "@/components/ui";
-import { useEffect, useRef } from "react";
+import { Textarea, useToast } from "@/components/ui";
+import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
+
+import { useEffect, useRef, useState } from "react";
+import { useDebounce } from "react-use";
 
 interface Props {
   content: string;
   setContent: React.Dispatch<React.SetStateAction<string>>;
   values: boolean[];
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  taskId: string;
 }
 
-export default function Editor({ content, setContent, values }: Props) {
+export default function Editor({
+  content,
+  setContent,
+  values,
+  setLoading,
+  taskId,
+}: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [defaultContent, setDefaultContent] = useState(content);
+  const [debounced, setDebounced] = useState(content);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -17,6 +32,48 @@ export default function Editor({ content, setContent, values }: Props) {
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   }, [content, ...values]);
+
+  useDebounce(
+    () => {
+      setDebounced(content);
+      update();
+    },
+    1000,
+    [content]
+  );
+
+  const update = async () => {
+    if (content.trim() != defaultContent.trim() && content.trim() != "") {
+      try {
+        setLoading(true);
+
+        const res = await axiosClient.patch(
+          "/task/" + taskId,
+          { content },
+          { withCredentials: true }
+        );
+
+        if (res.status === 200) {
+          setLoading(false);
+          setDefaultContent(content);
+        } else {
+          setLoading(false);
+          toast({
+            title: res.data || "An unknown error occurred.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        setLoading(false);
+        const errorMessage = handleAxiosErrorMessage(error);
+        toast({
+          title: errorMessage || "An unknown error occurred.",
+          variant: "destructive",
+        });
+        throw new Error(errorMessage);
+      }
+    }
+  };
 
   return (
     <Textarea

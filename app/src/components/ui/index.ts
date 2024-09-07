@@ -51,3 +51,9 @@ export {
   ResizablePanel,
   ResizablePanelGroup,
 } from "./resizable";
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./dropdown-menu";

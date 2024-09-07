@@ -1,13 +1,15 @@
 import { LoadingSpinner } from "./icons/LoadingSpinner";
 
 interface Props {
-  loading: boolean;
+  loading: boolean[];
 }
 
 export default function Loading({ loading }: Props) {
+  const isLoading = loading.some((value) => value);
+
   return (
-    loading && (
-      <div className="absolute left-0 right-0 top-4 p-4 flex items-center justify-center">
+    isLoading && (
+      <div className="fixed pl-[319px] left-0 right-0 top-20 p-4 flex items-center justify-center">
         <LoadingSpinner size={32} />
       </div>
     )

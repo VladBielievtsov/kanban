@@ -81,6 +81,10 @@ func (s *TaskServices) Update(userID *uuid.UUID, taskID string, req types.Update
 		task.Title = req.Title
 	}
 
+	if strings.TrimSpace(req.Content) != "" {
+		task.Content = req.Content
+	}
+
 	if err := s.db.Save(&task).Error; err != nil {
 		return task, http.StatusInternalServerError, fmt.Errorf("failed to update the task: %v", err)
 	}

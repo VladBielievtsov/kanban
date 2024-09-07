@@ -1,7 +1,14 @@
 "use client";
 
-import { Button, Separator } from "@/components/ui";
-import { CornerUpLeft } from "lucide-react";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Separator,
+} from "@/components/ui";
+import { CornerUpLeft, EllipsisVertical, FileDown, Share2 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import "./style.css";
@@ -14,6 +21,7 @@ import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { ITask } from "../../boards/[id]/Kanban";
 import Loading from "@/components/Loading";
 import TaskContent from "./TaskContent";
+import { useRouter } from "next/navigation";
 
 interface Props {
   id: string;
@@ -30,6 +38,8 @@ export default function Task({ id }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [task, setTask] = useState<TaskFull | null>(null);
   const [loadingTitle, setLoadingTitle] = useState<boolean>(false);
+  const [loadingContent, setLoadingContent] = useState<boolean>(false);
+  const router = useRouter();
 
   const getTask = async () => {
     try {
@@ -70,17 +80,32 @@ export default function Task({ id }: Props) {
 
   return (
     <div className="relative">
-      <Loading loading={loadingTitle} />
+      <Loading loading={[loadingTitle, loadingContent, loading]} />
       {error && <Alert variant="danger">{error}</Alert>}
-      {!loading && !error ? (
+      {!loading && !error && (
         <>
           <div className="mt-3 flex items-center justify-between">
-            <Button variant={"ghost"} asChild>
-              <Link href={"/"}>
-                <CornerUpLeft />
-              </Link>
+            <Button variant={"ghost"} onClick={() => router.back()}>
+              <CornerUpLeft />
             </Button>
-            <DeleteTask title={task?.title!} id={id} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={"outline"}>
+                  <EllipsisVertical size={20} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="flex justify-between cursor-pointer">
+                  <span>Share</span> <Share2 size={16} />
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex justify-between cursor-pointer">
+                  <span>Download</span> <FileDown size={16} />
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <DeleteTask title={task?.title!} id={id} />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="px-10 pt-4">
             <TaskInfo
@@ -92,15 +117,13 @@ export default function Task({ id }: Props) {
             <div className="py-10">
               <Separator />
             </div>
-            <TaskContent />
+            <TaskContent
+              doc={task?.content!}
+              taskId={id}
+              setLoading={setLoadingContent}
+            />
           </div>
         </>
-      ) : (
-        !error && (
-          <div className="p-4 flex items-center justify-center">
-            <LoadingSpinner size={32} />
-          </div>
-        )
       )}
     </div>
   );

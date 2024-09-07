@@ -12,8 +12,16 @@ import { useState } from "react";
 import Markdown from "react-markdown";
 import Editor from "./Editor";
 
-export default function TaskContent() {
-  const [content, setContent] = useState("");
+export default function TaskContent({
+  setLoading,
+  taskId,
+  doc,
+}: {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  taskId: string;
+  doc: string;
+}) {
+  const [content, setContent] = useState(doc);
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const [isSplit, setIsSplit] = useState<boolean>(false);
@@ -46,9 +54,11 @@ export default function TaskContent() {
         </div>
         {!isPreview && !isSplit && (
           <Editor
+            taskId={taskId}
             content={content}
             setContent={setContent}
             values={[isPreview, isSplit]}
+            setLoading={setLoading}
           />
         )}
 
@@ -58,9 +68,11 @@ export default function TaskContent() {
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel minSize={20}>
               <Editor
+                taskId={taskId}
                 content={content}
                 setContent={setContent}
                 values={[isPreview, isSplit]}
+                setLoading={setLoading}
               />
             </ResizablePanel>
             <ResizableHandle withHandle />
