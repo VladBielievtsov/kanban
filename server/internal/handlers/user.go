@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"kanban-api/internal/dto"
 	"kanban-api/internal/middlewares"
 	"kanban-api/internal/services"
-	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
 	"log"
 	"net/http"
@@ -69,7 +69,7 @@ func UpdateAvatar(db *gorm.DB, userServices *services.UserServices) http.Handler
 
 func ChangeName(db *gorm.DB, userServices *services.UserServices) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ChangeNameBody
+		var req dto.ChangeNameBody
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			log.Printf("Error decoding request body: %v", err)
 			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
@@ -108,7 +108,7 @@ func UpdatePassword(userServices *services.UserServices) http.HandlerFunc {
 			return
 		}
 
-		var req types.ChangePasswordBody
+		var req dto.ChangePasswordBody
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			log.Printf("Error decoding request body: %v", err)
 			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})

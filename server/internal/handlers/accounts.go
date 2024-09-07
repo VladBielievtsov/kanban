@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"kanban-api/internal/config"
+	"kanban-api/internal/dto"
 	"kanban-api/internal/middlewares"
 	"kanban-api/internal/services"
-	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
 	"net/http"
 
@@ -25,7 +25,7 @@ func FindConnectedAccounts(accountsServices *services.AccountsServices) http.Han
 			return
 		}
 
-		utils.JSONResponse(w, http.StatusOK, types.FilterConnectedAccount(accounts))
+		utils.JSONResponse(w, http.StatusOK, dto.FilterConnectedAccount(accounts))
 	}
 }
 

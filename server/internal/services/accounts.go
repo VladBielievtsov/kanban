@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -22,8 +22,8 @@ func NewAccountsServices(cfg *config.Config, db *gorm.DB) *AccountsServices {
 	}
 }
 
-func (s *AccountsServices) GetConnectedAccountsByUserID(userID string) ([]types.ExternalLogin, error) {
-	var externalLogin []types.ExternalLogin
+func (s *AccountsServices) GetConnectedAccountsByUserID(userID string) ([]dto.ExternalLogin, error) {
+	var externalLogin []dto.ExternalLogin
 
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *AccountsServices) GetConnectedAccountsByUserID(userID string) ([]types.
 }
 
 func (s *AccountsServices) UnlinkExternalLogin(userID, provider string) error {
-	err := s.db.Where("user_id = ? AND provider = ?", userID, provider).Delete(&types.ExternalLogin{}).Error
+	err := s.db.Where("user_id = ? AND provider = ?", userID, provider).Delete(&dto.ExternalLogin{}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("external login not found")
@@ -53,9 +53,9 @@ func (s *AccountsServices) UnlinkExternalLogin(userID, provider string) error {
 	return nil
 }
 
-func (s *AccountsServices) LinkGithubAccount(userID string, userInfo types.GithubResponse) error {
-	var externalLogin types.ExternalLogin
-	var user types.User
+func (s *AccountsServices) LinkGithubAccount(userID string, userInfo dto.GithubResponse) error {
+	var externalLogin dto.ExternalLogin
+	var user dto.User
 
 	err := s.db.Where("provider = ? AND external_id = ?", "github", userInfo.ID).First(&externalLogin).Error
 	if err == nil {
@@ -70,7 +70,7 @@ func (s *AccountsServices) LinkGithubAccount(userID string, userInfo types.Githu
 		return fmt.Errorf("failed to get user: %v", err)
 	}
 
-	newExternalLogin := types.ExternalLogin{
+	newExternalLogin := dto.ExternalLogin{
 		ID:         uuid.New(),
 		UserID:     *user.ID,
 		UserName:   userInfo.Login,

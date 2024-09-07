@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"kanban-api/internal/dto"
 	"kanban-api/internal/middlewares"
 	"kanban-api/internal/services"
-	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
 	"log"
 	"net/http"
@@ -120,7 +120,7 @@ func GetBoardByID(boardServices *services.BoardServices) http.HandlerFunc {
 
 func UpdateBoard(boardServices *services.BoardServices) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.UpdateBoardBody
+		var req dto.UpdateBoardBody
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			log.Printf("Error decoding request body: %v", err)
 			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})

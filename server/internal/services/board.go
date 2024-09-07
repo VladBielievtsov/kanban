@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"net/http"
 	"strings"
 
@@ -24,11 +24,11 @@ func NewBoardServices(cfg *config.Config, db *gorm.DB) *BoardServices {
 	}
 }
 
-func (s *BoardServices) CreateBoard(userID *uuid.UUID) (types.Board, error) {
-	board := types.Board{}
+func (s *BoardServices) CreateBoard(userID *uuid.UUID) (dto.Board, error) {
+	board := dto.Board{}
 	id := uuid.New()
 
-	board = types.Board{
+	board = dto.Board{
 		ID:          &id,
 		UserID:      userID,
 		Title:       "Untitled",
@@ -43,8 +43,8 @@ func (s *BoardServices) CreateBoard(userID *uuid.UUID) (types.Board, error) {
 	return board, nil
 }
 
-func (s *BoardServices) GetAll(userID *uuid.UUID) ([]types.Board, error) {
-	boards := []types.Board{}
+func (s *BoardServices) GetAll(userID *uuid.UUID) ([]dto.Board, error) {
+	boards := []dto.Board{}
 
 	if err := s.db.Where("user_id = ?", userID).Order("updated_at DESC").Find(&boards).Error; err != nil {
 		return boards, fmt.Errorf("failed to get a boards: %v", err)
@@ -59,7 +59,7 @@ func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, int, 
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to start transaction: %v", tx.Error)
 	}
 
-	var board types.Board
+	var board dto.Board
 	err := tx.Preload("Sections.Tasks").Where("id = ? AND user_id = ?", boardID, userID).First(&board).Error
 	if err != nil {
 		tx.Rollback()
@@ -70,20 +70,20 @@ func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, int, 
 	}
 
 	for _, section := range board.Sections {
-		taskResult := tx.Where("section_id = ?", section.ID).Delete(&types.Task{})
+		taskResult := tx.Where("section_id = ?", section.ID).Delete(&dto.Task{})
 		if taskResult.Error != nil {
 			tx.Rollback()
 			return "", http.StatusInternalServerError, fmt.Errorf("failed to delete tasks for section %v: %v", section.ID, taskResult.Error)
 		}
 	}
 
-	sectionResult := tx.Where("board_id = ?", boardID).Delete(&types.Section{})
+	sectionResult := tx.Where("board_id = ?", boardID).Delete(&dto.Section{})
 	if sectionResult.Error != nil {
 		tx.Rollback()
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete sections for the board: %v", sectionResult.Error)
 	}
 
-	boardResult := tx.Where("id = ? AND user_id = ?", boardID, userID).Delete(&types.Board{})
+	boardResult := tx.Where("id = ? AND user_id = ?", boardID, userID).Delete(&dto.Board{})
 	if boardResult.Error != nil {
 		tx.Rollback()
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete the board: %v", boardResult.Error)
@@ -101,8 +101,8 @@ func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, int, 
 	return boardID, http.StatusOK, nil
 }
 
-func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (types.Board, int, error) {
-	board := types.Board{}
+func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (dto.Board, int, error) {
+	board := dto.Board{}
 
 	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).Preload("Sections", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at ASC").Preload("Tasks", func(db *gorm.DB) *gorm.DB {
@@ -121,8 +121,8 @@ func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (types.Board,
 	return board, http.StatusOK, nil
 }
 
-func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req types.UpdateBoardBody) (types.Board, error) {
-	board := types.Board{}
+func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req dto.UpdateBoardBody) (dto.Board, error) {
+	board := dto.Board{}
 
 	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -148,8 +148,8 @@ func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req types.Upda
 	return board, nil
 }
 
-func (s *BoardServices) ToggleFavorite(userID *uuid.UUID, boardID string) (types.Board, int, error) {
-	board := types.Board{}
+func (s *BoardServices) ToggleFavorite(userID *uuid.UUID, boardID string) (dto.Board, int, error) {
+	board := dto.Board{}
 
 	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

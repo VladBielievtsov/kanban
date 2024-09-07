@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"net/http"
 	"strings"
 
@@ -23,8 +23,8 @@ func NewSectionServices(cfg *config.Config, db *gorm.DB) *SectionServices {
 	}
 }
 
-func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (types.Section, int, error) {
-	section := types.Section{}
+func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (dto.Section, int, error) {
+	section := dto.Section{}
 	id := uuid.New()
 
 	boardUUID, err := uuid.Parse(boardID)
@@ -32,7 +32,7 @@ func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (types.Secti
 		return section, http.StatusBadRequest, fmt.Errorf("invalid section ID: %v", err)
 	}
 
-	section = types.Section{
+	section = dto.Section{
 		ID:      &id,
 		Title:   "Untitled",
 		UserID:  userID,
@@ -46,8 +46,8 @@ func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (types.Secti
 	return section, http.StatusOK, nil
 }
 
-func (s *SectionServices) UpdateTitle(userID *uuid.UUID, sectionID string, req types.UpdateSectionBody) (types.Section, int, error) {
-	section := types.Section{}
+func (s *SectionServices) UpdateTitle(userID *uuid.UUID, sectionID string, req dto.UpdateSectionBody) (dto.Section, int, error) {
+	section := dto.Section{}
 
 	result := s.db.Where("user_id = ? AND id = ?", userID, sectionID).First(&section)
 	if result.Error != nil {
@@ -75,13 +75,13 @@ func (s *SectionServices) Delete(userID *uuid.UUID, sectionID string) (string, i
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to start transaction: %v", tx.Error)
 	}
 
-	taskResult := tx.Where("section_id = ? AND user_id = ?", sectionID, userID).Delete(&types.Task{})
+	taskResult := tx.Where("section_id = ? AND user_id = ?", sectionID, userID).Delete(&dto.Task{})
 	if taskResult.Error != nil {
 		tx.Rollback()
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete tasks associated with the section: %v", taskResult.Error)
 	}
 
-	sectionResult := tx.Where("id = ? AND user_id = ?", sectionID, userID).Delete(&types.Section{})
+	sectionResult := tx.Where("id = ? AND user_id = ?", sectionID, userID).Delete(&dto.Section{})
 	if sectionResult.Error != nil {
 		tx.Rollback()
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete the section: %v", sectionResult.Error)

@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"kanban-api/internal/config"
+	"kanban-api/internal/dto"
 	"kanban-api/internal/middlewares"
 	"kanban-api/internal/services"
-	"kanban-api/internal/types"
 	"kanban-api/internal/utils"
 	"log"
 	"net/http"
@@ -99,13 +99,13 @@ func GetMe(userServices *services.UserServices) http.HandlerFunc {
 			return
 		}
 
-		utils.JSONResponse(w, http.StatusOK, types.FilterUser(user))
+		utils.JSONResponse(w, http.StatusOK, dto.FilterUser(user))
 	}
 }
 
 func Login(authServices *services.AuthServices) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.LoginBody
+		var req dto.LoginBody
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			log.Printf("Error decoding request body: %v", err)
 			utils.JSONResponse(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
@@ -142,7 +142,7 @@ func Login(authServices *services.AuthServices) http.HandlerFunc {
 			Path:     "/",
 		})
 
-		utils.JSONResponse(w, http.StatusOK, types.FilterUser(user))
+		utils.JSONResponse(w, http.StatusOK, dto.FilterUser(user))
 	}
 }
 

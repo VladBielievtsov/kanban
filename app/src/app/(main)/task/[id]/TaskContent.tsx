@@ -39,16 +39,16 @@ export default function TaskContent({
   return (
     <div
       className={cn(
-        !isSplit ? "max-w-6xl mx-auto" : "max-w-full",
+        !isSplit ? "max-w-6xl mx-auto pb-6" : "max-w-full",
         "prose lg:prose-xl"
       )}
     >
       <div className="border-input border rounded-md relative">
         <div className="absolute top-2 right-2">
-          <Button variant={"ghost"} onClick={onPreview}>
+          <Button variant={isPreview ? "outline" : "ghost"} onClick={onPreview}>
             <Fullscreen size={20} />
           </Button>
-          <Button variant={"ghost"} onClick={onSplit}>
+          <Button variant={isSplit ? "outline" : "ghost"} onClick={onSplit}>
             <Columns2 size={20} />
           </Button>
         </div>

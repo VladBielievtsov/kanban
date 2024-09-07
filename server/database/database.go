@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"log"
 
 	"gorm.io/driver/postgres"
@@ -34,7 +34,7 @@ func ConnectDatabase() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&types.User{}, &types.ExternalLogin{}, &types.Board{}, &types.Section{}, &types.Task{})
+	err := db.AutoMigrate(&dto.User{}, &dto.ExternalLogin{}, &dto.Board{}, &dto.Section{}, &dto.Task{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}

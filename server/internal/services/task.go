@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"net/http"
 	"strings"
 
@@ -24,8 +24,8 @@ func NewTaskServices(cfg *config.Config, db *gorm.DB) *TaskServices {
 	}
 }
 
-func (s *TaskServices) Create(userID uuid.UUID, sectionID string) (types.Task, int, error) {
-	task := types.Task{}
+func (s *TaskServices) Create(userID uuid.UUID, sectionID string) (dto.Task, int, error) {
+	task := dto.Task{}
 	id := uuid.New()
 
 	sectionUUID, err := uuid.Parse(sectionID)
@@ -34,11 +34,11 @@ func (s *TaskServices) Create(userID uuid.UUID, sectionID string) (types.Task, i
 	}
 
 	var tasksCount int64
-	if err := s.db.Model(&types.Task{}).Where("section_id = ?", sectionID).Count(&tasksCount).Error; err != nil {
+	if err := s.db.Model(&dto.Task{}).Where("section_id = ?", sectionID).Count(&tasksCount).Error; err != nil {
 		return task, http.StatusNotFound, fmt.Errorf("failed to count tasks: %v", err)
 	}
 
-	task = types.Task{
+	task = dto.Task{
 		ID:        id,
 		Title:     "Untitled",
 		UserID:    userID,
@@ -54,8 +54,8 @@ func (s *TaskServices) Create(userID uuid.UUID, sectionID string) (types.Task, i
 	return task, http.StatusOK, nil
 }
 
-func (s *TaskServices) GetByID(taskID string) (types.Task, int, error) {
-	task := types.Task{}
+func (s *TaskServices) GetByID(taskID string) (dto.Task, int, error) {
+	task := dto.Task{}
 
 	if err := s.db.Where("id = ?", taskID).First(&task).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -67,8 +67,8 @@ func (s *TaskServices) GetByID(taskID string) (types.Task, int, error) {
 	return task, http.StatusOK, nil
 }
 
-func (s *TaskServices) Update(userID *uuid.UUID, taskID string, req types.UpdateTaskBody) (types.Task, int, error) {
-	task := types.Task{}
+func (s *TaskServices) Update(userID *uuid.UUID, taskID string, req dto.UpdateTaskBody) (dto.Task, int, error) {
+	task := dto.Task{}
 
 	if err := s.db.Where("user_id = ? AND id = ?", userID, taskID).First(&task).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -93,7 +93,7 @@ func (s *TaskServices) Update(userID *uuid.UUID, taskID string, req types.Update
 }
 
 func (s *TaskServices) Delete(userID *uuid.UUID, taskID string) (string, int, error) {
-	result := s.db.Where("id = ? AND user_id = ?", taskID, userID).Delete(&types.Task{})
+	result := s.db.Where("id = ? AND user_id = ?", taskID, userID).Delete(&dto.Task{})
 	if result.Error != nil {
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to delete task: %v", result.Error)
 	}

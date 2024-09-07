@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"kanban-api/internal/utils"
 	"net/http"
 	"time"
@@ -30,7 +30,7 @@ func NewAuthServices(cfg *config.Config, db *gorm.DB) *AuthServices {
 	}
 }
 
-func (s *AuthServices) GetGithubUser(w http.ResponseWriter, r *http.Request, githubOauthConfig *oauth2.Config) (types.GithubResponse, error) {
+func (s *AuthServices) GetGithubUser(w http.ResponseWriter, r *http.Request, githubOauthConfig *oauth2.Config) (dto.GithubResponse, error) {
 
 	errorRes := r.URL.Query().Has("error")
 	if errorRes {
@@ -41,44 +41,44 @@ func (s *AuthServices) GetGithubUser(w http.ResponseWriter, r *http.Request, git
 	code := r.URL.Query().Get("code")
 	token, err := githubOauthConfig.Exchange(context.Background(), code)
 	if err != nil {
-		return types.GithubResponse{}, err
+		return dto.GithubResponse{}, err
 	}
 
 	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(token))
 	response, err := client.Get("https://api.github.com/user")
 	if err != nil {
-		return types.GithubResponse{}, err
+		return dto.GithubResponse{}, err
 	}
 	defer response.Body.Close()
 
-	var userInfo types.GithubResponse
+	var userInfo dto.GithubResponse
 
 	if err := json.NewDecoder(response.Body).Decode(&userInfo); err != nil {
-		return types.GithubResponse{}, err
+		return dto.GithubResponse{}, err
 	}
 
 	return userInfo, nil
 }
 
-func (s *AuthServices) AuthByGithub(githubResponse types.GithubResponse) (types.UserResponse, string, error) {
-	var externalLogin types.ExternalLogin
-	var user types.User
+func (s *AuthServices) AuthByGithub(githubResponse dto.GithubResponse) (dto.UserResponse, string, error) {
+	var externalLogin dto.ExternalLogin
+	var user dto.User
 
 	err := s.db.Where("provider = ? AND external_id = ?", "github", githubResponse.ID).First(&externalLogin).Error
 	if err == nil {
 		err := s.db.Where("id = ?", externalLogin.UserID).First(&user).Error
 		if err != nil {
-			return types.UserResponse{}, "", fmt.Errorf("failed to get users: %v", err)
+			return dto.UserResponse{}, "", fmt.Errorf("failed to get users: %v", err)
 		}
 		externalLogin.UserName = githubResponse.Login
 		err = s.db.Save(&externalLogin).Error
 		if err != nil {
-			return types.UserResponse{}, "", fmt.Errorf("failed to get users: %v", err)
+			return dto.UserResponse{}, "", fmt.Errorf("failed to get users: %v", err)
 		}
 	} else if errors.Is(err, gorm.ErrRecordNotFound) {
 		err := s.db.Where("email = ?", githubResponse.Email).First(&user).Error
 		if err == nil {
-			newExternalLogin := types.ExternalLogin{
+			newExternalLogin := dto.ExternalLogin{
 				ID:         uuid.New(),
 				UserID:     *user.ID,
 				UserName:   githubResponse.Login,
@@ -88,7 +88,7 @@ func (s *AuthServices) AuthByGithub(githubResponse types.GithubResponse) (types.
 			s.db.Create(&newExternalLogin)
 		} else if errors.Is(err, gorm.ErrRecordNotFound) {
 			newUserID := uuid.New()
-			newUser := types.User{
+			newUser := dto.User{
 				ID:        &newUserID,
 				Email:     githubResponse.Email,
 				AvatarURL: githubResponse.AvatarURL,
@@ -97,7 +97,7 @@ func (s *AuthServices) AuthByGithub(githubResponse types.GithubResponse) (types.
 				Password:  "",
 			}
 			s.db.Create(&newUser)
-			newExternalLogin := types.ExternalLogin{
+			newExternalLogin := dto.ExternalLogin{
 				ID:         uuid.New(),
 				UserID:     *newUser.ID,
 				UserName:   githubResponse.Login,
@@ -107,22 +107,22 @@ func (s *AuthServices) AuthByGithub(githubResponse types.GithubResponse) (types.
 			s.db.Create(&newExternalLogin)
 			user = newUser
 		} else {
-			return types.UserResponse{}, "", fmt.Errorf("failed to find or create user: %w", err)
+			return dto.UserResponse{}, "", fmt.Errorf("failed to find or create user: %w", err)
 		}
 	} else {
-		return types.UserResponse{}, "", fmt.Errorf("failed to auth: %v", err)
+		return dto.UserResponse{}, "", fmt.Errorf("failed to auth: %v", err)
 	}
 
 	token, err := utils.GenerateToken(user, s.cfg.Application.JwtSecret)
 	if err != nil {
-		return types.UserResponse{}, "", err
+		return dto.UserResponse{}, "", err
 	}
 
-	return types.FilterUser(user), token, nil
+	return dto.FilterUser(user), token, nil
 }
 
-func (s *AuthServices) LoginByEmail(email, password string) (types.User, string, error) {
-	var user types.User
+func (s *AuthServices) LoginByEmail(email, password string) (dto.User, string, error) {
+	var user dto.User
 
 	err := s.db.Where("LOWER(email) = LOWER(?)", email).First(&user).Error
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"kanban-api/internal/config"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"kanban-api/internal/utils"
 	"net/http"
 	"os"
@@ -28,8 +28,8 @@ func NewUserServices(cfg *config.Config, db *gorm.DB) *UserServices {
 	}
 }
 
-func (s *UserServices) GetAllUsers() ([]types.User, error) {
-	var users []types.User
+func (s *UserServices) GetAllUsers() ([]dto.User, error) {
+	var users []dto.User
 	tx := s.db.Begin()
 
 	defer func() {
@@ -51,8 +51,8 @@ func (s *UserServices) GetAllUsers() ([]types.User, error) {
 	return users, nil
 }
 
-func (s *UserServices) GetUserByID(userID string) (types.User, error) {
-	var user types.User
+func (s *UserServices) GetUserByID(userID string) (dto.User, error) {
+	var user dto.User
 
 	err := s.db.Where("id = ?", userID).First(&user).Error
 	if err != nil {
@@ -104,7 +104,7 @@ func (s *UserServices) UploadAvatar(w http.ResponseWriter, r *http.Request, user
 }
 
 func (s *UserServices) UpdatePassword(userID, OldPassword, NewPassword string) (map[string]string, error) {
-	var user types.User
+	var user dto.User
 
 	err := s.db.Where("id = ?", userID).First(&user).Error
 	if err != nil {

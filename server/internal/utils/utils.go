@@ -3,7 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"kanban-api/internal/types"
+	"kanban-api/internal/dto"
 	"log"
 	"net/http"
 	"os"
@@ -50,7 +50,7 @@ func EnsureDirExists(path string) error {
 	return nil
 }
 
-func GenerateToken(user types.User, jwtSecret string) (string, error) {
+func GenerateToken(user dto.User, jwtSecret string) (string, error) {
 	tokenByte := jwt.New(jwt.SigningMethodHS256)
 	now := time.Now().UTC()
 	claims := tokenByte.Claims.(jwt.MapClaims)
