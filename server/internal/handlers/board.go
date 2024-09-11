@@ -27,9 +27,9 @@ func CreateBoard(boardServices *services.BoardServices) http.HandlerFunc {
 			return
 		}
 
-		board, err := boardServices.CreateBoard(&id)
+		board, status, err := boardServices.CreateBoard(&id)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 
@@ -50,9 +50,9 @@ func GetAllBoards(boardServices *services.BoardServices) http.HandlerFunc {
 			return
 		}
 
-		boards, err := boardServices.GetAll(&id)
+		boards, status, err := boardServices.GetAll(&id)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 
@@ -144,9 +144,9 @@ func UpdateBoard(boardServices *services.BoardServices) http.HandlerFunc {
 			return
 		}
 
-		board, err := boardServices.Update(&id, boardID, req)
+		board, status, err := boardServices.Update(&id, boardID, req)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 

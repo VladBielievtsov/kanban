@@ -24,7 +24,7 @@ func NewBoardServices(cfg *config.Config, db *gorm.DB) *BoardServices {
 	}
 }
 
-func (s *BoardServices) CreateBoard(userID *uuid.UUID) (dto.Board, error) {
+func (s *BoardServices) CreateBoard(userID *uuid.UUID) (dto.Board, int, error) {
 	board := dto.Board{}
 	id := uuid.New()
 
@@ -37,20 +37,20 @@ func (s *BoardServices) CreateBoard(userID *uuid.UUID) (dto.Board, error) {
 	}
 
 	if err := s.db.Create(&board).Error; err != nil {
-		return board, fmt.Errorf("failed to create a board: %v", err)
+		return board, http.StatusInternalServerError, fmt.Errorf("failed to create a board: %v", err)
 	}
 
-	return board, nil
+	return board, http.StatusOK, nil
 }
 
-func (s *BoardServices) GetAll(userID *uuid.UUID) ([]dto.Board, error) {
+func (s *BoardServices) GetAll(userID *uuid.UUID) ([]dto.Board, int, error) {
 	var boards []dto.Board
 
 	if err := s.db.Where("user_id = ?", userID).Order("updated_at DESC").Find(&boards).Error; err != nil {
-		return boards, fmt.Errorf("failed to get a boards: %v", err)
+		return boards, http.StatusNotFound, fmt.Errorf("failed to get a boards: %v", err)
 	}
 
-	return boards, nil
+	return boards, http.StatusOK, nil
 }
 
 func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, int, error) {
@@ -121,14 +121,14 @@ func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (dto.Board, i
 	return board, http.StatusOK, nil
 }
 
-func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req dto.UpdateBoardBody) (dto.Board, error) {
+func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req dto.UpdateBoardBody) (dto.Board, int, error) {
 	var board dto.Board
 
 	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return board, fmt.Errorf("no board found with the specified ID for this user")
+			return board, http.StatusNotFound, fmt.Errorf("no board found with the specified ID for this user")
 		}
-		return board, fmt.Errorf("failed to find the board: %v", err)
+		return board, http.StatusNotFound, fmt.Errorf("failed to find the board: %v", err)
 	}
 
 	if strings.TrimSpace(req.Title) != "" {
@@ -142,10 +142,10 @@ func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req dto.Update
 	}
 
 	if err := s.db.Save(&board).Error; err != nil {
-		return board, fmt.Errorf("failed to update the board: %v", err)
+		return board, http.StatusInternalServerError, fmt.Errorf("failed to update the board: %v", err)
 	}
 
-	return board, nil
+	return board, http.StatusOK, nil
 }
 
 func (s *BoardServices) ToggleFavorite(userID *uuid.UUID, boardID string) (dto.Board, int, error) {

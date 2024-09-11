@@ -44,9 +44,9 @@ func UnlinkExternalLogin(userServices *services.UserServices, accountsServices *
 			return
 		}
 
-		user, err := userServices.GetUserByID(userID)
+		user, status, err := userServices.GetUserByID(userID)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 

@@ -17,13 +17,13 @@ import (
 
 func GetAllUsers(userServices *services.UserServices) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		users, err := userServices.GetAllUsers()
+		users, status, err := userServices.GetAllUsers()
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 
-		utils.JSONResponse(w, http.StatusOK, users)
+		utils.JSONResponse(w, status, users)
 	}
 }
 
@@ -34,15 +34,15 @@ func UpdateAvatar(db *gorm.DB, userServices *services.UserServices) http.Handler
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		user, err := userServices.GetUserByID(userID)
+		user, status, err := userServices.GetUserByID(userID)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 
-		url, err := userServices.UploadAvatar(w, r, userID)
+		url, status, err := userServices.UploadAvatar(w, r, userID)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 
@@ -82,9 +82,9 @@ func ChangeName(db *gorm.DB, userServices *services.UserServices) http.HandlerFu
 			return
 		}
 
-		user, err := userServices.GetUserByID(userID)
+		user, status, err := userServices.GetUserByID(userID)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 
@@ -115,9 +115,9 @@ func UpdatePassword(userServices *services.UserServices) http.HandlerFunc {
 			return
 		}
 
-		result, err := userServices.UpdatePassword(userID, req.OldPassword, req.NewPassword)
+		result, status, err := userServices.UpdatePassword(userID, req.OldPassword, req.NewPassword)
 		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			utils.JSONResponse(w, status, map[string]string{"message": err.Error()})
 			return
 		}
 		utils.JSONResponse(w, http.StatusOK, result)
