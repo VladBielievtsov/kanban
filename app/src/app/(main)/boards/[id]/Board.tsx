@@ -39,6 +39,7 @@ export default function Board({ id }: Props) {
             tasks: section.tasks.map((task) => ({
               id: task.id,
               title: task.title,
+              position: task.position,
             })),
           })
         );

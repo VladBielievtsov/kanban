@@ -24,7 +24,7 @@ func NewSectionServices(cfg *config.Config, db *gorm.DB) *SectionServices {
 }
 
 func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (dto.Section, int, error) {
-	section := dto.Section{}
+	var section dto.Section
 	id := uuid.New()
 
 	boardUUID, err := uuid.Parse(boardID)
@@ -47,7 +47,7 @@ func (s *SectionServices) Create(userID *uuid.UUID, boardID string) (dto.Section
 }
 
 func (s *SectionServices) UpdateTitle(userID *uuid.UUID, sectionID string, req dto.UpdateSectionBody) (dto.Section, int, error) {
-	section := dto.Section{}
+	var section dto.Section
 
 	result := s.db.Where("user_id = ? AND id = ?", userID, sectionID).First(&section)
 	if result.Error != nil {

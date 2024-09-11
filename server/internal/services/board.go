@@ -44,7 +44,7 @@ func (s *BoardServices) CreateBoard(userID *uuid.UUID) (dto.Board, error) {
 }
 
 func (s *BoardServices) GetAll(userID *uuid.UUID) ([]dto.Board, error) {
-	boards := []dto.Board{}
+	var boards []dto.Board
 
 	if err := s.db.Where("user_id = ?", userID).Order("updated_at DESC").Find(&boards).Error; err != nil {
 		return boards, fmt.Errorf("failed to get a boards: %v", err)
@@ -102,11 +102,11 @@ func (s *BoardServices) Delete(userID *uuid.UUID, boardID string) (string, int, 
 }
 
 func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (dto.Board, int, error) {
-	board := dto.Board{}
+	var board dto.Board
 
 	result := s.db.Where("user_id = ? AND id = ?", userID, boardID).Preload("Sections", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at ASC").Preload("Tasks", func(db *gorm.DB) *gorm.DB {
-			return db.Order("created_at ASC")
+			return db.Order("position ASC")
 		})
 	}).First(&board)
 	if result.Error != nil {
@@ -122,7 +122,7 @@ func (s *BoardServices) GetByID(userID *uuid.UUID, boardID string) (dto.Board, i
 }
 
 func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req dto.UpdateBoardBody) (dto.Board, error) {
-	board := dto.Board{}
+	var board dto.Board
 
 	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -149,7 +149,7 @@ func (s *BoardServices) Update(userID *uuid.UUID, boardID string, req dto.Update
 }
 
 func (s *BoardServices) ToggleFavorite(userID *uuid.UUID, boardID string) (dto.Board, int, error) {
-	board := dto.Board{}
+	var board dto.Board
 
 	if err := s.db.Where("user_id = ? AND id = ?", userID, boardID).First(&board).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

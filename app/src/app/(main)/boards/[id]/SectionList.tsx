@@ -1,6 +1,8 @@
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import SectionItem from "./SectionItem";
 import { Sections } from "./Kanban";
+import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
+import { useToast } from "@/components/ui";
 
 interface Props {
   sections: Sections[];
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export default function SectionList({ sections, setSections }: Props) {
+  const { toast } = useToast();
+
   const onDragEnd = ({ source, destination }: DropResult) => {
     if (!destination) return;
     const sourceColIndex = sections.findIndex(
@@ -16,27 +20,75 @@ export default function SectionList({ sections, setSections }: Props) {
     const destinationColIndex = sections.findIndex(
       (e) => e.id === destination.droppableId
     );
+
     const sourceCol = sections[sourceColIndex];
     const destinationCol = sections[destinationColIndex];
-
-    const sourceSectionId = sourceCol.id;
-    const destinationSectionId = destinationCol.id;
 
     const sourceTasks = [...sourceCol.tasks];
     const destinationTasks = [...destinationCol.tasks];
 
+    let movedTask;
+
     if (source.droppableId !== destination.droppableId) {
-      const [removed] = sourceTasks.splice(source.index, 1);
-      destinationTasks.splice(destination.index, 0, removed);
-      sections[sourceColIndex].tasks = sourceTasks;
-      sections[destinationColIndex].tasks = destinationTasks;
+      [movedTask] = sourceTasks.splice(source.index, 1);
+      destinationTasks.splice(destination.index, 0, movedTask);
     } else {
-      const [removed] = destinationTasks.splice(source.index, 1);
-      destinationTasks.splice(destination.index, 0, removed);
-      sections[destinationColIndex].tasks = destinationTasks;
+      [movedTask] = destinationTasks.splice(source.index, 1);
+      destinationTasks.splice(destination.index, 0, movedTask);
     }
 
-    setSections(sections);
+    const updatedSections = [...sections];
+    updatedSections[sourceColIndex] = { ...sourceCol, tasks: sourceTasks };
+    updatedSections[destinationColIndex] = {
+      ...destinationCol,
+      tasks: destinationTasks,
+    };
+
+    setSections(updatedSections);
+    updatePosition(
+      movedTask.id,
+      destination.droppableId,
+      destination.index,
+      sourceCol.id
+    );
+  };
+
+  const updatePosition = async (
+    taskID: string,
+    destinationSectionId: string,
+    destinationPosition: number,
+    sourceSectionId: string
+  ) => {
+    try {
+      const res = await axiosClient.patch(
+        "/task/" + taskID + "/position",
+        {
+          destination_section_id: destinationSectionId,
+          destination_position: destinationPosition,
+          source_section_id: sourceSectionId,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        toast({
+          title: "Task position has been updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: res.data || "An unknown error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      const errorMessage = handleAxiosErrorMessage(error);
+      toast({
+        title: errorMessage || "An unknown error occurred.",
+        variant: "destructive",
+      });
+      throw new Error(errorMessage);
+    }
   };
 
   return (
@@ -53,7 +105,7 @@ export default function SectionList({ sections, setSections }: Props) {
             boardID={section.board_id}
             sections={sections}
             setSections={setSections}
-            tasks={section.tasks}
+            section={section}
           />
         ))}
       </div>

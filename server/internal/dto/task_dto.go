@@ -21,3 +21,9 @@ type UpdateTaskBody struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
+
+type UpdateTaskPositionBody struct {
+	SourceSectionID      string `json:"source_section_id"`
+	DestinationSectionID string `json:"destination_section_id"`
+	DestinationPosition  int    `json:"destination_position"`
+}

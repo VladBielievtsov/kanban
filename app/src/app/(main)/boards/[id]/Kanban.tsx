@@ -26,6 +26,7 @@ export interface Sections {
 export interface ITask {
   id: string;
   title: string;
+  position: number;
 }
 
 export default function Kanban({ boardId, sections, setSections }: Props) {
