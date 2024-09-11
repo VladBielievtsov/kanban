@@ -9,7 +9,6 @@ import {
   Separator,
 } from "@/components/ui";
 import { CornerUpLeft, EllipsisVertical, FileDown, Share2 } from "lucide-react";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import "./style.css";
 import DeleteTask from "@/components/DeleteTask";
@@ -17,7 +16,6 @@ import TaskInfo from "./TaskInfo";
 import axios from "axios";
 import { axiosClient } from "@/lib/axios-client";
 import Alert from "@/components/Alert";
-import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { ITask } from "../../boards/[id]/Kanban";
 import Loading from "@/components/Loading";
 import TaskContent from "./TaskContent";
@@ -55,6 +53,7 @@ export default function Task({ id }: Props) {
           content: res.data.content,
           createdAt: res.data.createdAt,
           updatedAt: res.data.updatedAt,
+          position: res.data.position,
         });
       } else {
         console.log(res);

@@ -1,0 +1,10 @@
+.prose * {
+  color: hsl(var(--foreground)) !important;
+}
+
+.prose
+  :where(ol > li):not(
+    :where([class~="not-prose"], [class~="not-prose"] *)
+  )::marker {
+  color: hsl(var(--foreground)) !important;
+}

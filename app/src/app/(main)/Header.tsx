@@ -1,21 +1,14 @@
 import React from "react";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { Button } from "@/components/ui";
-import { Soup } from "lucide-react";
-import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function Header() {
   return (
     <header className="bground z-50 h-[60px] flex items-center fixed top-0 left-0 right-0 border-b dark:border-zinc-600 border-zinc-200">
       <div className="px-6 flex justify-between items-center w-full">
         <div>
-          <Link
-            href={"/"}
-            className="flex items-center gap-2 text-zinc-800 dark:text-zinc-300"
-          >
-            <Soup size={24} />
-            <span className="text-lg font-bold">Kanban</span>
-          </Link>
+          <Logo />
         </div>
         <div className="flex items-center gap-2.5">
           <div>

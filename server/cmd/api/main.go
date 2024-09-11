@@ -106,11 +106,11 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthMiddleware(cfg.Application.JwtSecret))
 		r.Post("/task/{section-id}", handlers.CreateTask(taskServices))
-		r.Get("/task/{id}", handlers.GetTaskByID(taskServices))
 		r.Patch("/task/{id}", handlers.UpdateTask(taskServices))
 		r.Delete("/task/{id}", handlers.DeleteTask(taskServices))
 		r.Patch("/task/{id}/position", handlers.UpdateTaskPosition(taskServices))
 	})
+	r.Get("/task/{id}", handlers.GetTaskByID(taskServices))
 
 	err = http.ListenAndServe(":"+cfg.Application.Port, r)
 	if err != nil {
