@@ -1,3 +1,4 @@
+import React from "react";
 import { Input, useToast } from "@/components/ui";
 import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 import { useState } from "react";
@@ -21,13 +22,11 @@ export default function SectionControls({
 }: Props) {
   const [defaultTitle, setDefaultTitle] = useState(title);
   const [newTitle, setNewTitle] = useState(title);
-  const [debouncedTitle, setDebouncedTitle] = useState(newTitle);
 
   const { toast } = useToast();
 
   useDebounce(
     () => {
-      setDebouncedTitle(newTitle);
       updateTitle();
     },
     1000,

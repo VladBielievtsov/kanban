@@ -4,10 +4,11 @@ import { Separator } from "@/components/ui";
 import Markdown from "react-markdown";
 import "./style.css";
 import { axiosClient } from "@/lib/axios-client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Loading from "@/components/Loading";
 import Alert from "@/components/Alert";
+import { formatDate } from "@/utils/utils";
 
 interface Props {
   taskId: string;
@@ -24,7 +25,7 @@ export default function SharedTask({ taskId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [task, setTask] = useState<ITask | null>(null);
 
-  const getTask = async () => {
+  const getTask = useCallback(async () => {
     try {
       const res = await axiosClient.get("/task/" + taskId);
 
@@ -50,22 +51,22 @@ export default function SharedTask({ taskId }: Props) {
         setLoading(false);
       }
     }
-  };
+  }, [taskId]);
 
   useEffect(() => {
     getTask();
-  }, []);
+  }, [getTask]);
 
   return (
     <div className="pt-[60px]">
-      <Loading loading={[loading]} />
+      <Loading loading={[loading]} className="pl-0" />
       {error && <Alert variant="danger">{error}</Alert>}
       {!loading && !error && (
         <>
           <div className="pt-14">
             <h1 className="text-4xl font-bold">{task?.title}</h1>
             <div className="font-bold opacity-60 py-3">
-              <p>Created at: {task?.createdAt}</p>
+              <p>Created at: {formatDate(task?.createdAt!)}</p>
             </div>
           </div>
           <div className="py-10">

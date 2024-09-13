@@ -8,7 +8,6 @@ import { Button, Input, Textarea, useToast } from "@/components/ui";
 import DeleteBoard from "@/components/DeleteBoard";
 import { useDebounce } from "react-use";
 import { useBoardsStore } from "@/store/boards";
-import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import { handleAxiosErrorMessage } from "@/lib/axios-client";
 import ToggleBoardFavorite from "@/components/ToggleBoardFavorite";
 import Loading from "@/components/Loading";
@@ -37,8 +36,6 @@ export default function BoardInfo({
   setIcon,
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [debouncedTitle, setDebouncedTitle] = useState(title);
-  const [debouncedDescription, setDebouncedDescription] = useState(description);
   const [defaultValues, setDefaultValues] = useState({
     title,
     description,
@@ -64,7 +61,6 @@ export default function BoardInfo({
 
   useDebounce(
     () => {
-      setDebouncedTitle(title);
       Save(icon);
     },
     1000,
@@ -73,7 +69,6 @@ export default function BoardInfo({
 
   useDebounce(
     () => {
-      setDebouncedDescription(description);
       Save(icon);
     },
     1000,

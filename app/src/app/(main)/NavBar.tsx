@@ -2,7 +2,7 @@
 
 import LogoutBtn from "@/components/LogoutBtn";
 import UserCard from "@/components/UserCard";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import BoardsList from "./BoardsList";
 import { useBoardsStore } from "@/store/boards";
 
@@ -11,7 +11,7 @@ export default function NavBar() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getAllBoards = async () => {
+  const getAllBoards = useCallback(async () => {
     setLoading(true);
     const res = await allBoards();
     if (res.status === 200) {
@@ -19,7 +19,7 @@ export default function NavBar() {
     } else {
       setError(res.data || "An unknown error occurred.");
     }
-  };
+  }, [allBoards]);
 
   useEffect(() => {
     if (!boards) {
@@ -27,7 +27,7 @@ export default function NavBar() {
     } else {
       setLoading(false);
     }
-  }, [boards, allBoards]);
+  }, [boards, getAllBoards]);
 
   return (
     <div className="h-full border-r dark:border-zinc-600 border-zinc-200">

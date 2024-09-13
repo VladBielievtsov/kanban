@@ -1,8 +1,7 @@
-import CreateBoard from "@/components/CreateBoard";
 import { Metadata } from "next";
-import React from "react";
+import CreateBoard from "@/components/CreateBoard";
 
-export default function () {
+export default function page() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="flex flex-col justify-center">

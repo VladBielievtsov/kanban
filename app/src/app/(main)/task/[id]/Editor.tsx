@@ -1,3 +1,4 @@
+import React from "react";
 import { Textarea, useToast } from "@/components/ui";
 import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
 
@@ -21,7 +22,6 @@ export default function Editor({
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [defaultContent, setDefaultContent] = useState(content);
-  const [debounced, setDebounced] = useState(content);
 
   const { toast } = useToast();
 
@@ -31,11 +31,10 @@ export default function Editor({
       textarea.style.height = "auto";
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
-  }, [content, ...values]);
+  }, [content, values]);
 
   useDebounce(
     () => {
-      setDebounced(content);
       update();
     },
     1000,

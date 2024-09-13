@@ -31,7 +31,7 @@ export default function ConnectedAccounts() {
 
   useEffect(() => {
     getAccounts();
-  }, []);
+  }, [getAccounts]);
 
   const handleUnlink = async () => {
     setUnlinkLoading(true);

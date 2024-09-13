@@ -1,3 +1,4 @@
+import React from "react";
 import { Sections } from "@/app/(main)/boards/[id]/Kanban";
 import {
   AlertDialog,

@@ -1,8 +1,10 @@
+import React from "react";
 import { Input, useToast } from "@/components/ui";
 import { TaskFull } from "./Task";
 import { useState } from "react";
 import { useDebounce } from "react-use";
 import { axiosClient, handleAxiosErrorMessage } from "@/lib/axios-client";
+import { formatDate } from "@/utils/utils";
 
 interface Props {
   taskId: string;
@@ -11,25 +13,14 @@ interface Props {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function formatDate(timestamp: string) {
-  const date = new Date(timestamp);
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = date.toLocaleString("en-GB", { month: "short" });
-  const year = date.getFullYear();
-
-  return `${day} ${month}, ${year}`;
-}
-
 export default function TaskInfo({ taskId, task, setTask, setLoading }: Props) {
   const [defaultTitle, setDefaultTitle] = useState(task.title);
   const [newTitle, setNewTitle] = useState(task.title);
-  const [debouncedTitle, setDebouncedTitle] = useState(newTitle);
 
   const { toast } = useToast();
 
   useDebounce(
     () => {
-      setDebouncedTitle(newTitle);
       updateTitle();
     },
     1000,

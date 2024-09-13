@@ -1,9 +1,9 @@
+import React from "react";
 import {
   Button,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Textarea,
 } from "@/components/ui";
 
 import { cn } from "@/lib/utils";

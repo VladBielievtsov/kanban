@@ -10,12 +10,9 @@ import {
   TabsContent,
 } from "@/components/ui";
 import React from "react";
-import { useUserStore } from "@/store/user";
 import ChangePassword from "./ChangePassword";
 
 export default function SecurityTab() {
-  const { user } = useUserStore();
-
   return (
     <TabsContent value="security" className="w-full mt-0">
       <Card className="bground dark:border-zinc-600 border-zinc-200 border-0 rounded-l-none border-l ">

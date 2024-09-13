@@ -27,7 +27,7 @@ interface Props {
   userID: string | undefined;
 }
 
-export default function UserAvatar({ avatar_url, first_name, userID }: Props) {
+export default function UserAvatar({ avatar_url, first_name }: Props) {
   const { theme } = useThemeStore();
   const { updateAvatar } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);

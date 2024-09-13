@@ -3,7 +3,7 @@
 import { axiosClient } from "@/lib/axios-client";
 import BoardInfo from "./BoardInfo";
 import Kanban, { Sections } from "./Kanban";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Alert from "@/components/Alert";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
@@ -21,7 +21,7 @@ export default function Board({ id }: Props) {
   const [isFav, setIsFav] = useState<boolean>(false);
   const [sections, setSections] = useState<Sections[]>([]);
 
-  const getBoard = async () => {
+  const getBoard = useCallback(async () => {
     try {
       const res = await axiosClient.get("/board/" + id, {
         withCredentials: true,
@@ -61,11 +61,11 @@ export default function Board({ id }: Props) {
         setLoading(false);
       }
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     getBoard();
-  }, []);
+  }, [getBoard]);
 
   useEffect(() => {
     sections;

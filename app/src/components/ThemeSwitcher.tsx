@@ -1,9 +1,9 @@
 "use client";
 
+import React from "react";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/store/theme";
 import { Moon, Sun } from "lucide-react";
-import React, { useState } from "react";
 
 export default function ThemeSwitcher() {
   const { setDark, setLight, theme } = useThemeStore();

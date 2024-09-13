@@ -1,3 +1,4 @@
+import React from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import SectionItem from "./SectionItem";
 import { Sections } from "./Kanban";

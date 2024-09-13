@@ -9,7 +9,7 @@ import {
   Separator,
 } from "@/components/ui";
 import { CornerUpLeft, EllipsisVertical, FileDown, Share2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./style.css";
 import DeleteTask from "@/components/DeleteTask";
 import TaskInfo from "./TaskInfo";
@@ -39,7 +39,7 @@ export default function Task({ id }: Props) {
   const [loadingContent, setLoadingContent] = useState<boolean>(false);
   const router = useRouter();
 
-  const getTask = async () => {
+  const getTask = useCallback(async () => {
     try {
       const res = await axiosClient.get("/task/" + id, {
         withCredentials: true,
@@ -71,11 +71,11 @@ export default function Task({ id }: Props) {
         setLoading(false);
       }
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     getTask();
-  }, []);
+  }, [getTask]);
 
   return (
     <div className="relative">
