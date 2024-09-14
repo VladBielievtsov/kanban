@@ -1,7 +1,7 @@
 import React from "react";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { Button } from "@/components/ui";
-import Logo from "@/components/Logo";
+import Logo from "@/components/common/Logo";
 
 export default function Header() {
   return (

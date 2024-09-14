@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorText from "@/components/ErrorText";
+import ErrorText from "@/components/common/ErrorText";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import {
   Button,

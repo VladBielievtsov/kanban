@@ -1,23 +1,16 @@
 "use client";
 
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Separator,
-} from "@/components/ui";
-import { CornerUpLeft, EllipsisVertical, FileDown, Share2 } from "lucide-react";
+import { Button, Separator } from "@/components/ui";
+import { CornerUpLeft, Share2 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import "./style.css";
 import DeleteTask from "@/components/DeleteTask";
 import TaskInfo from "./TaskInfo";
 import axios from "axios";
 import { axiosClient } from "@/lib/axios-client";
-import Alert from "@/components/Alert";
+import Alert from "@/components/common/Alert";
 import { ITask } from "../../boards/[id]/Kanban";
-import Loading from "@/components/Loading";
+import Loading from "@/components/common/Loading";
 import TaskContent from "./TaskContent";
 import { useRouter } from "next/navigation";
 
@@ -77,6 +70,10 @@ export default function Task({ id }: Props) {
     getTask();
   }, [getTask]);
 
+  const onShare = () => {
+    console.log(router);
+  };
+
   return (
     <div className="relative">
       <Loading loading={[loadingTitle, loadingContent, loading]} />
@@ -85,26 +82,14 @@ export default function Task({ id }: Props) {
         <>
           <div className="mt-3 flex items-center justify-between">
             <Button variant={"ghost"} onClick={() => router.back()}>
-              <CornerUpLeft />
+              <CornerUpLeft size={18} />
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant={"outline"}>
-                  <EllipsisVertical size={20} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem className="flex justify-between cursor-pointer">
-                  <span>Share</span> <Share2 size={16} />
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex justify-between cursor-pointer">
-                  <span>Download</span> <FileDown size={16} />
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <DeleteTask title={task?.title!} id={id} />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex">
+              <Button variant={"ghost"}>
+                <Share2 size={18} />
+              </Button>
+              <DeleteTask title={task?.title!} id={id} />
+            </div>
           </div>
           <div className="px-10 pt-4">
             <TaskInfo

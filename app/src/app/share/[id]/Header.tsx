@@ -1,4 +1,4 @@
-import Logo from "@/components/Logo";
+import Logo from "@/components/common/Logo";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import React from "react";
 

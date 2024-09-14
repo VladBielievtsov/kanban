@@ -5,7 +5,7 @@ import BoardInfo from "./BoardInfo";
 import Kanban, { Sections } from "./Kanban";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import Alert from "@/components/Alert";
+import Alert from "@/components/common/Alert";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 
 interface Props {

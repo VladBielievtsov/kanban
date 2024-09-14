@@ -6,8 +6,8 @@ import "./style.css";
 import { axiosClient } from "@/lib/axios-client";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import Loading from "@/components/Loading";
-import Alert from "@/components/Alert";
+import Loading from "@/components/common/Loading";
+import Alert from "@/components/common/Alert";
 import { formatDate } from "@/utils/utils";
 
 interface Props {

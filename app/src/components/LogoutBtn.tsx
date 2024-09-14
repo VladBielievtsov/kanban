@@ -7,7 +7,7 @@ import { useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "./icons/LoadingSpinner";
 import { cn } from "@/lib/utils";
-import ErrorText from "./ErrorText";
+import ErrorText from "./common/ErrorText";
 
 export default function LogoutBtn() {
   const { logout } = useUserStore();
@@ -50,7 +50,7 @@ export default function LogoutBtn() {
         ) : (
           <>
             <p className="font-bold text-sm">Logout</p>
-            <LogOut />
+            <LogOut size={18} />
           </>
         )}
       </Button>

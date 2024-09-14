@@ -46,10 +46,10 @@ export default function TaskContent({
       <div className="border-input border rounded-md relative">
         <div className="absolute top-2 right-2">
           <Button variant={isPreview ? "outline" : "ghost"} onClick={onPreview}>
-            <Fullscreen size={20} />
+            <Fullscreen size={18} />
           </Button>
           <Button variant={isSplit ? "outline" : "ghost"} onClick={onSplit}>
-            <Columns2 size={20} />
+            <Columns2 size={18} />
           </Button>
         </div>
         {!isPreview && !isSplit && (
@@ -66,7 +66,7 @@ export default function TaskContent({
 
         {isSplit && (
           <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel minSize={20}>
+            <ResizablePanel minSize={18}>
               <Editor
                 taskId={taskId}
                 content={content}
@@ -76,7 +76,7 @@ export default function TaskContent({
               />
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel minSize={20}>
+            <ResizablePanel minSize={18}>
               <Preview content={content} />
             </ResizablePanel>
           </ResizablePanelGroup>

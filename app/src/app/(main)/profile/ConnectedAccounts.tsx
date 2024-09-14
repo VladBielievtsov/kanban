@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorText from "@/components/ErrorText";
+import ErrorText from "@/components/common/ErrorText";
 import Github from "@/components/icons/Github";
 import { LoadingSpinner } from "@/components/icons/LoadingSpinner";
 import {
@@ -70,7 +70,8 @@ export default function ConnectedAccounts() {
           <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
               <Button className="gap-2">
-                <Github /> <span>{connectedAccounts[0].user_name}</span>
+                <Github size={18} />
+                <span>{connectedAccounts[0].user_name}</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

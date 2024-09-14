@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { LoadingSpinner } from "./icons/LoadingSpinner";
+import { LoadingSpinner } from "../icons/LoadingSpinner";
 
 interface Props {
   loading: boolean[];

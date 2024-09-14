@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Board, useBoardsStore } from "@/store/boards";
 import { Skeleton } from "@/components/ui";
-import ErrorText from "@/components/ErrorText";
+import ErrorText from "@/components/common/ErrorText";
 
 interface Props {
   variant: "all" | "favorites";

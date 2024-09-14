@@ -10,7 +10,7 @@ import { useDebounce } from "react-use";
 import { useBoardsStore } from "@/store/boards";
 import { handleAxiosErrorMessage } from "@/lib/axios-client";
 import ToggleBoardFavorite from "@/components/ToggleBoardFavorite";
-import Loading from "@/components/Loading";
+import Loading from "@/components/common/Loading";
 
 interface Props {
   boardId: string;
@@ -119,7 +119,7 @@ export default function BoardInfo({
           <div>
             <Button variant={"ghost"} asChild>
               <Link href={"/"}>
-                <CornerUpLeft />
+                <CornerUpLeft size={18} />
               </Link>
             </Button>
             <ToggleBoardFavorite

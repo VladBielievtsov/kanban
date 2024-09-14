@@ -16,7 +16,7 @@ import {
 } from "./ui";
 import { useState } from "react";
 import { useBoardsStore } from "@/store/boards";
-import ErrorText from "./ErrorText";
+import ErrorText from "./common/ErrorText";
 import { LoadingSpinner } from "./icons/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import { handleAxiosErrorMessage } from "@/lib/axios-client";
@@ -79,7 +79,7 @@ export default function DeleteBoard({ id }: Props) {
     <AlertDialog defaultOpen={open} open={open}>
       <AlertDialogTrigger asChild>
         <Button variant={"ghost"} onClick={onOpen}>
-          <Trash2 />
+          <Trash2 size={18} />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
