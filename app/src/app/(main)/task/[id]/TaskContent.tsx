@@ -9,8 +9,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Columns2, Fullscreen } from "lucide-react";
 import { useState } from "react";
-import Markdown from "react-markdown";
 import Editor from "./Editor";
+import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 export default function TaskContent({
   setLoading,
@@ -62,7 +62,7 @@ export default function TaskContent({
           />
         )}
 
-        {isPreview && !isSplit && <Preview content={content} />}
+        {isPreview && !isSplit && <MarkdownRenderer content={content} />}
 
         {isSplit && (
           <ResizablePanelGroup direction="horizontal">
@@ -77,15 +77,11 @@ export default function TaskContent({
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel minSize={18}>
-              <Preview content={content} />
+              <MarkdownRenderer content={content} />
             </ResizablePanel>
           </ResizablePanelGroup>
         )}
       </div>
     </div>
   );
-}
-
-function Preview({ content }: { content: string }) {
-  return <Markdown className="p-2 min-h-20">{content}</Markdown>;
 }

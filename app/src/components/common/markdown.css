@@ -1,0 +1,63 @@
+.markdown-style img {
+  display: block;
+  max-width: 100%;
+}
+
+.markdown-style p code {
+  background-color: #313244;
+  border-radius: 6px;
+  padding: 0em 0.2em;
+}
+
+html.light .markdown-style p code {
+  background-color: #a6adc8;
+}
+
+.markdown-style pre {
+  background-color: #313244;
+  border-radius: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.markdown-style > pre {
+  border: 1px solid #6c7086;
+}
+
+html.light .markdown-style pre {
+  background-color: #a6adc8;
+}
+
+html.light .markdown-style > pre {
+  border: 1px solid #6c7086;
+}
+
+.markdown-style .contains-task-list {
+  list-style: none;
+}
+
+.markdown-style .task-list-item input {
+  display: none;
+}
+
+.markdown-style .task-list-item {
+  position: relative;
+}
+
+.markdown-style .task-list-item::before {
+  position: absolute;
+  left: -20px;
+  top: 10px;
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background-color: #dd787830;
+  border: 1px solid #e64553;
+}
+
+.markdown-style .task-list-item:has(> input:checked)::before {
+  background-color: #40a02b;
+  border: 1px solid #40a02b;
+}

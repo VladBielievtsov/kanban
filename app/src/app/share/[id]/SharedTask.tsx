@@ -1,7 +1,6 @@
 "use client";
 
 import { Separator } from "@/components/ui";
-import Markdown from "react-markdown";
 import "./style.css";
 import { axiosClient } from "@/lib/axios-client";
 import { useCallback, useEffect, useState } from "react";
@@ -9,6 +8,7 @@ import axios from "axios";
 import Loading from "@/components/common/Loading";
 import Alert from "@/components/common/Alert";
 import { formatDate } from "@/utils/utils";
+import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 interface Props {
   taskId: string;
@@ -72,8 +72,8 @@ export default function SharedTask({ taskId }: Props) {
           <div className="py-10">
             <Separator />
           </div>
-          <div className="prose lg:prose-xl">
-            <Markdown className={"p-2"}>{task?.content}</Markdown>
+          <div className="prose lg:prose-xl max-w-full">
+            <MarkdownRenderer content={task?.content!} />
           </div>
         </>
       )}
