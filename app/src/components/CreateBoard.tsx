@@ -5,7 +5,21 @@ import { useBoardsStore } from "@/store/boards";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "./icons/LoadingSpinner";
 
-export default function CreateBoard() {
+interface Props {
+  content: string;
+  className?: string;
+  variant?:
+    | "link"
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | null
+    | undefined;
+}
+
+export default function CreateBoard({ variant, className, content }: Props) {
   const { createBoard } = useBoardsStore();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -29,8 +43,13 @@ export default function CreateBoard() {
   };
 
   return (
-    <Button onClick={onCreate} disabled={loading} className="min-w-[202px]">
-      {loading ? <LoadingSpinner /> : "Create"}
+    <Button
+      variant={variant}
+      onClick={onCreate}
+      disabled={loading}
+      className={className}
+    >
+      {loading ? <LoadingSpinner /> : content}
     </Button>
   );
 }

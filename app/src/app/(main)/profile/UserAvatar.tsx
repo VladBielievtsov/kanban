@@ -152,13 +152,13 @@ export default function UserAvatar({ avatar_url, first_name }: Props) {
         </DialogTrigger>
         <DialogContent className="bground max-w-none w-auto">
           <DialogHeader>
-            <DialogTitle>Crop avatar</DialogTitle>
+            <DialogTitle className="text-text">Crop avatar</DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <div className="py-4">
             {!file && (
               <>
-                <label className="relative rounded-full transition w-[270px] h-[270px] bg-zinc-300 hover:bg-zinc-400 dark:bg-[#434343] dark:hover:bg-[#2e2e2e] cursor-pointer flex items-center justify-center">
+                <label className="relative rounded-full transition w-[270px] h-[270px] bg-surface hover:bg-surface/80 cursor-pointer flex items-center justify-center">
                   <Camera className="w-[80px] h-[80px]" />
                   <input
                     type="file"
@@ -233,7 +233,7 @@ export default function UserAvatar({ avatar_url, first_name }: Props) {
           )}
         </DialogContent>
       </Dialog>
-      <div>
+      <div className="text-text">
         <b>Profile Picture</b>
         <p className="opacity-50">PNG, JPG, GIF max size of 5MB</p>
       </div>

@@ -9,7 +9,7 @@ export default function ThemeSwitcher() {
   const { setDark, setLight, theme } = useThemeStore();
 
   return (
-    <div className="border border-zinc-600 rounded-md flex items-center relative">
+    <div className="border border-surface rounded-md flex items-center relative">
       <div
         className={cn(
           theme === "dark" ? "translate-x-[42px]" : "translate-x-[2px]",

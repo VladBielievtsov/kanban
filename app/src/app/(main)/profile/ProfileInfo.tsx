@@ -12,7 +12,7 @@ export default function ProfileInfo() {
 
   return (
     <div className="my-5">
-      <h3 className="text-xl font-bold">Profile</h3>
+      <h3 className="text-xl font-bold text-text">Profile</h3>
       <UserAvatar
         avatar_url={user?.avatar_url}
         first_name={user?.first_name}
@@ -24,9 +24,7 @@ export default function ProfileInfo() {
       </div>
       <Separator />
       <div className="pt-6">
-        <Label className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
-          Email
-        </Label>
+        <Label className="text-sm font-bold text-text">Email</Label>
         <Input
           disabled
           defaultValue={user?.email}

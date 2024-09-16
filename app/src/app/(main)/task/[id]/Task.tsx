@@ -13,6 +13,7 @@ import { ITask } from "../../boards/[id]/Kanban";
 import Loading from "@/components/common/Loading";
 import TaskContent from "./TaskContent";
 import { useRouter } from "next/navigation";
+import ShareTask from "@/components/ShareTask";
 
 interface Props {
   id: string;
@@ -70,10 +71,6 @@ export default function Task({ id }: Props) {
     getTask();
   }, [getTask]);
 
-  const onShare = () => {
-    console.log(router);
-  };
-
   return (
     <div className="relative">
       <Loading loading={[loadingTitle, loadingContent, loading]} />
@@ -85,9 +82,7 @@ export default function Task({ id }: Props) {
               <CornerUpLeft size={18} />
             </Button>
             <div className="flex">
-              <Button variant={"ghost"}>
-                <Share2 size={18} />
-              </Button>
+              <ShareTask />
               <DeleteTask title={task?.title!} id={id} />
             </div>
           </div>

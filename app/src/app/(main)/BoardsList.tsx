@@ -33,7 +33,7 @@ export default function BoardsList({ variant, loading, error }: Props) {
       </h2>
       <div className="flex flex-col mt-2">
         {loading ? (
-          <div className="flex items-center dark:border-zinc-600 border border-transparent border-zinc-200 rounded-lg p-3">
+          <div className="flex items-center border border-surface rounded-lg p-3">
             <Skeleton className="w-5 h-6 mr-2" />
             <Skeleton className="w-20 h-3" />
           </div>
@@ -44,7 +44,7 @@ export default function BoardsList({ variant, loading, error }: Props) {
             <Link
               key={b.id}
               href={"/boards/" + b.id}
-              className="dark:hover:border-zinc-600 border border-transparent hover:border-zinc-200 rounded-lg p-3"
+              className="border border-transparent hover:border-surface rounded-lg p-3"
             >
               {b.icon} {b.title}
             </Link>

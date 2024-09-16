@@ -64,7 +64,7 @@ export default function LoginForm() {
 
   return (
     <div className="max-w-[400px] w-full">
-      <div className="text-zinc-800 dark:text-zinc-300 flex flex-col items-center">
+      <div className="text-text flex flex-col items-center">
         <Soup size={32} strokeWidth={2} />
         <span className="text-2xl py-[30px] font-bold">Kanban</span>
       </div>
@@ -78,7 +78,7 @@ export default function LoginForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                <FormLabel className="text-sm font-bold text-text">
                   Email
                 </FormLabel>
                 <FormControl>
@@ -93,7 +93,7 @@ export default function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                <FormLabel className="text-sm font-bold text-text">
                   Password
                 </FormLabel>
                 <FormControl>

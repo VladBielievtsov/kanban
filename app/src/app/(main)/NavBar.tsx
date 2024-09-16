@@ -30,7 +30,7 @@ export default function NavBar() {
   }, [boards, getAllBoards]);
 
   return (
-    <div className="h-full border-r dark:border-zinc-600 border-zinc-200">
+    <div className="h-full border-r border-surface surface">
       <div className="p-4 h-full flex flex-col">
         <UserCard />
         <div className="grid gap-5">

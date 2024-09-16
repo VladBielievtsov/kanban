@@ -29,11 +29,12 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --text: 0 0% 0%;
+    --text: 240 23% 9%;
+    --surface: 228 24% 72%;
+    --mauve: 267 84% 81%;
   }
 
   .dark {
-    --text: 0 0% 100%;
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -58,6 +59,9 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --text: 226 64% 88%;
+    --surface: 233 12% 39%;
+    --mauve: 267 84% 81%;
   }
 }
 
@@ -66,11 +70,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-text;
   }
 
   .bground {
-    @apply dark:bg-zinc-900 bg-white;
+    @apply dark:bg-[#11111b] bg-white;
   }
 
   /* width */
@@ -96,7 +100,7 @@
 }
 
 #nprogress .bar {
-  @apply bg-indigo-500 z-[9999] !important;
+  @apply bg-[#89b4fa] z-[9999] !important;
 }
 
 #nprogress .peg {

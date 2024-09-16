@@ -87,7 +87,7 @@ export default function ChangePassword() {
             name="old_password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+                <FormLabel className="text-sm font-bold text-text">
                   Old password
                 </FormLabel>
                 <FormControl>
@@ -103,7 +103,7 @@ export default function ChangePassword() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+              <FormLabel className="text-sm font-bold text-text">
                 New password
               </FormLabel>
               <FormControl>
@@ -118,7 +118,7 @@ export default function ChangePassword() {
           name="confirmation_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+              <FormLabel className="text-sm font-bold text-text">
                 Confirm new password
               </FormLabel>
               <FormControl>

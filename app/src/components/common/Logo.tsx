@@ -6,7 +6,7 @@ export default function Logo() {
   return (
     <Link
       href={"/"}
-      className="flex items-center gap-2 text-zinc-800 dark:text-zinc-300"
+      className="flex items-center gap-2 text-[#11111b] dark:text-[#cdd6f4]"
     >
       <Soup size={24} />
       <span className="text-lg font-bold">Kanban</span>

@@ -50,7 +50,7 @@ export default function SectionItem({
                       {...provided.dragHandleProps}
                       className={cn(
                         snapshot.isDragging ? "cursor-grab" : "cursor-pointer",
-                        "flex items-center justify-between px-3 py-2 mb-2 font-bold text-sm rounded-md bg-input border border-input"
+                        "flex items-center justify-between px-3 py-2 mb-2 font-bold text-sm rounded-md bg-surface/30 border border-surface"
                       )}
                     >
                       <span>{task.title === "" ? "Untitled" : task.title}</span>

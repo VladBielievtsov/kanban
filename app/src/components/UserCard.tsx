@@ -12,7 +12,7 @@ export default function UserCard() {
     <>
       <Link
         href={"/profile"}
-        className="mb-10 flex items-center gap-4 border border-zinc-200 dark:border-zinc-600 w-full rounded-lg p-3 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+        className="mb-10 flex items-center gap-4 border border-surface w-full rounded-lg p-3 dark:hover:bg-[#1e1e2e] hover:bg-[#cdd6f4]"
       >
         {!user || loading ? (
           <>

@@ -43,7 +43,7 @@ export default function TaskContent({
         "prose lg:prose-xl"
       )}
     >
-      <div className="border-input border rounded-md relative">
+      <div className="border-surface border rounded-md relative">
         <div className="absolute top-2 right-2">
           <Button variant={isPreview ? "outline" : "ghost"} onClick={onPreview}>
             <Fullscreen size={18} />

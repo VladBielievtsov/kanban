@@ -57,7 +57,7 @@ export default function ConnectedAccounts() {
 
   return (
     <div className="mt-5 flex items-start justify-between">
-      <div>
+      <div className="text-text">
         <h3 className="text-xl font-bold">Connected accounts</h3>
         {connectedAccounts ? (
           <p className="opacity-50">Your account is connected to Github</p>

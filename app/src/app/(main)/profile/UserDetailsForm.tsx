@@ -102,7 +102,7 @@ export default function UserDetailsForm() {
           name="firstName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+              <FormLabel className="text-sm font-bold text-text">
                 First Name
               </FormLabel>
               <FormControl>
@@ -117,7 +117,7 @@ export default function UserDetailsForm() {
           name="lastName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-bold text-zinc-800 dark:text-zinc-300">
+              <FormLabel className="text-sm font-bold text-text">
                 Last Name
               </FormLabel>
               <FormControl>

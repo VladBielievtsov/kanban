@@ -42,7 +42,7 @@ export default function LogoutBtn() {
         className={cn(
           !loading && "items-center justify-between",
           loading && "justify-center",
-          "mt-2 h-auto bg-transparent text-foreground flex border border-zinc-200 dark:border-zinc-600 w-full rounded-lg p-3 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          "mt-2 h-auto bg-transparent text-text flex border border-surface w-full rounded-lg p-3 dark:hover:bg-[#1e1e2e] hover:bg-[#cdd6f4]"
         )}
       >
         {loading ? (
