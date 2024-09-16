@@ -66,7 +66,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   async setUser() {
-    set({ loading: true, error: null });
+    set({ loading: true });
 
     try {
       const res = await axios.get("http://localhost:4000/me", {
@@ -74,16 +74,15 @@ export const useUserStore = create<UserStore>((set, get) => ({
       });
 
       if (res.status === 200) {
-        set({ user: res.data, loading: false, error: null });
+        set({ user: res.data, loading: false });
       } else {
         set({
           loading: false,
-          error: res.data.message || "Failed to get user",
         });
       }
     } catch (error) {
-      const errorMessage = handleAxiosErrorMessage(error);
-      set({ loading: false, error: errorMessage });
+      // const errorMessage = handleAxiosErrorMessage(error);
+      set({ loading: false });
     }
   },
   async logout() {
