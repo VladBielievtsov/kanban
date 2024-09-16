@@ -47,7 +47,11 @@ export default function ToggleBoardFavorite({
 
   return (
     <Button variant={"ghost"} onClick={handleToggleFav} disabled={loading}>
-      {isFav ? <Star fill="#FBBF24" stroke="#FBBF24" size={18} /> : <Star />}
+      {isFav ? (
+        <Star fill="#FBBF24" stroke="#FBBF24" size={18} />
+      ) : (
+        <Star size={18} />
+      )}
     </Button>
   );
 }
